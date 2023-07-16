@@ -31,4 +31,4 @@ Script description                                                              
 
 - News Feeds https://www.facebook.com/itselectlab/
 - Articles https://blog.itselectlab.com/
-- Official Page. https://itselectlab.com/"# lazyfrida"  git init git add README.md git commit -m "first commit" git branch -M main git remote add origin https://github.com/thaisingle/lazyfrida.git git push -u origin main
+- Official Page. https://itselectlab.com/"# lazyfrida" 
