@@ -31,4 +31,4 @@ Script description                                                              
 
 - News Feeds https://www.facebook.com/itselectlab/
 - Articles https://blog.itselectlab.com/
-- Official Page. https://itselectlab.com/"# lazyfrida" 
+- Official Page. https://itselectlab.com/"
