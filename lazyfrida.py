@@ -1,124 +1,76 @@
 import subprocess
 import platform
 import urllib.request
-import zipfile
 import lzma
 import argparse
 import sys
 
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
-def print_green(text):
-   print(bcolors.OKGREEN + text + bcolors.ENDC)
-
-def print_red(text):
-    print(bcolors.WARNING + text + bcolors.ENDC)
-
-
 def create_virtualenv(env_name):
-	print_green("\n---> Start creating environment...")
-	try:
-		# Install virtualenv
-		subprocess.run(['pip', 'install', 'virtualenv'])
+	print("\n---> Start creating environment...")
 
-		# Create virtual environment
-		subprocess.run(['virtualenv', env_name])
+	command = ['pip', 'install', 'virtualenv']
+	run_command(command,False,"Install virtualenv")
 
-        	# Activate virtual environment
-		if platform.system() == 'Windows':
-			activate_cmd = '{}\\Scripts\\activate'.format(env_name)
-		else:
-			activate_cmd = 'source {}/bin/activate'.format(env_name)
-
-		subprocess.run(activate_cmd, shell=True)
-		print_green("---> Virtual environment created and activated successfully.")
-		return True 
-
-	except Exception as e:
-		print("Error: {}".format(e))
-		print_red("---> Failed to create or activate virtual environment.")
-		return False
-
+	command = ['virtualenv', env_name]
+	
+	run_command(command, False, "Create virtual environment")
+	if platform.system() == 'Windows':
+		command = '{}\\Scripts\\activate'.format(env_name)
+	else:
+		command = 'source {}/bin/activate'.format(env_name)
+	output = run_command([command], True, "Activate virtual environment")
+	
+	return output
 
 
 def install_or_upgrade_frida_tools():
-	print_green("\n---> Start installing or upgrading frida-tools...")
-	try:
-		subprocess.check_call(['pip', 'install', '--index-url=https://pypi.python.org/simple/', '--upgrade', 'frida-tools'])
-		print_green("---> Frida-tools installed or upgraded successfully.")
-		return True
-	except subprocess.CalledProcessError as e:
-		print_red("---> Failed to install or upgrade Frida-tools. Error:", e)
-		return False
+	command = ['pip', 'install', '--index-url=https://pypi.python.org/simple/', '--upgrade', 'frida-tools']
+	output = run_command(command, False, "Frida-tools installation")
+	return output
 
 
 def check_root_status():
-	print_green("\n---> Start checking rooted device...")
-	try:
-		is_rooted = False
-		# Check if ADB is connected to at least one device
-		result = subprocess.run(['adb', 'devices'], capture_output=True, text=True)
-		output = result.stdout.strip()
-
-		if "List of devices attached" in output:
-			devices = output.split('\n')[1:]
-			connected_devices = [device.split('\t')[0] for device in devices if device]
-
-			if connected_devices:
-				print("USB device(s) connected:")
-				for device in connected_devices:
-					print(device)
-                
-                # Check root status
-				root_result = subprocess.run(['adb', 'shell', 'su', '-c', 'id'], capture_output=True, text=True)
-				root_output = root_result.stdout.strip()
-                
-				if "uid=0" in root_output:
-					print("Device is rooted.")
-					is_rooted = True
-				else:
-					print_red("Device is not rooted.")
-			else:
-				print_red("No USB devices connected.")
+	command = ['adb', 'devices']
+	output = run_command(command, shell=False, objecive="ADB device check")
+    
+	if output is not None and "List of devices attached" in output:
+		devices = output.split('\n')[1:]
+		connected_devices = [device.split('\t')[0] for device in devices if device]
+        
+		for device in connected_devices:
+			print(device)
+        
+		root_output = run_command(['adb', 'shell', 'su', '-c', 'id'], shell=False, objecive="Root status check")
+        
+		if root_output is not None and "uid=0" in root_output:
+			print("Device is rooted.")
+			return True
 		else:
-			print_red("ADB server not running or USB debugging not enabled.")
-		return is_rooted
-
-	except FileNotFoundError:
-		print_red("ADB is not installed or not found.")
+			print("Device is not rooted.")
+			return False
+	elif output is not None:
+		print("No USB devices connected.")
+		return False
+	else:
+		print("ADB server not running or USB debugging not enabled.")
 		return False
 
 
 def check_android_cpu():
-	print_green("\n---> Start checking Android CPU...")
-	try:
-		result = subprocess.run(['adb', 'shell', 'getprop', 'ro.product.cpu.abi'], capture_output=True, text=True)
-		output = result.stdout.strip()
-        
-		if output:
-			print("CPU Architecture:", output)
-			return output
-		else:
-			print_red("Unable to retrieve CPU architecture.")
-			return ""
-
-	except FileNotFoundError:
-		print_red("ADB is not installed or not found.")
+	command = ['adb', 'shell', 'getprop', 'ro.product.cpu.abi']
+	output = run_command(command, False, "CPU architecture retrieval")
+    
+	if output is not None and output.strip():
+		print("CPU Architecture:", output)
+		return output
+	else:
+		print("Unable to retrieve CPU architecture.")
 		return ""
 
 
 def match_cpu_architecture_with_download(cpu_architecture, cpu_download, selected_cpu):
-	print_green("\n---> Start checking architecture...")
+	print("\nStart checking architecture...")
 	architecture_mapping = dict(zip(cpu_architecture, cpu_download))
 
 	if selected_cpu in architecture_mapping:
@@ -126,39 +78,34 @@ def match_cpu_architecture_with_download(cpu_architecture, cpu_download, selecte
 		print("The matching CPU download for '{}' is: {}".format(selected_cpu, matching_download))
 		return matching_download
 	else:
-		print_red("No matching CPU download found for '{}'.".format(selected_cpu))
+		print("No matching CPU download found for '{}'.".format(selected_cpu))
 		return None
 
 
+
 def download_frida_server_url(architecture):
-	print_green("\n---> Start checking Frida Download URL...")
-	try:
-		curl_command = 'curl -s https://api.github.com/repos/frida/frida/releases/latest | grep "browser_download_url.*frida-server.*{}.xz"'.format(architecture)
-		result = subprocess.run(curl_command, capture_output=True, text=True, shell=True)
-		output = result.stdout.strip()
-		print(curl_command)
-
-		if output:
-			download_url = output.split('"')[3]
-			print("Download URL:", download_url)
-			return download_url
-		else:
-			return None
-
-	except FileNotFoundError:
-		print_red("curl command not found.")
-		print_red("Unable to find the download URL for frida-server.")
+	print("\nStart checking Frida Download URL...")
+    
+	command = 'curl -s https://api.github.com/repos/frida/frida/releases/latest | grep "browser_download_url.*frida-server.*{}.xz"'.format(architecture)
+	result = run_command(command, True, "Download URL retrieval")
+    
+	if result is not None and result.strip():
+		output = result.strip()
+		download_url = output.split('"')[3]
+		print("Download URL:", download_url)
+		return download_url
+	else:
 		return None
 
 
 def download_frida(url, output_path):
-	print_green("\n---> Start downloading Frida-server...")
+	print("\nStart downloading Frida-server...")
 	try:
 		urllib.request.urlretrieve(url, output_path)
 		print("File downloaded successfully.")
 		return True
 	except Exception as e:
-		print_red("An error occurred while downloading the file: {}".format(str(e)))
+		print("An error occurred while downloading the file: {}".format(str(e)))
 		return False
 	except KeyboardInterrupt:
 			# Handle Ctrl+C keyboard interrupt
@@ -166,7 +113,7 @@ def download_frida(url, output_path):
 
 
 def extract_xz(xz_path, extract_path):
-	print_green("\n---> Start extracting .xz file...")
+	print("\nStart extracting .xz file...")
 	try:
 		with lzma.open(xz_path, 'rb') as xz_file:
 			with open(extract_path, 'wb') as extract_file:
@@ -174,120 +121,121 @@ def extract_xz(xz_path, extract_path):
 		print("XZ file extracted successfully.")
 		return True
 	except Exception as e:
-		print_red("An error occurred while extracting the XZ file: {}".format(str(e)))
+		print("An error occurred while extracting the XZ file: {}".format(str(e)))
 		return False
 
 
 def copy_to_device():
-	print_green("\n---> Start coppting frida-server to an android device...")
-	try:
-		# Push frida-server to /data/local/tmp
-		subprocess.run(['adb', 'push', 'frida-server', '/data/local/tmp'], check=True)
-		subprocess.run(['adb', 'shell', 'su', '-c', 'chmod +x /data/local/tmp/frida-server'], check=True)
-		print("Frida server coppied successfully.")
-		return True
-
-	except subprocess.CalledProcessError as e:
-		print_red("An error occurred while coppied Frida server: {}".format(str(e)))
+	adb_push_command = ['adb', 'push', 'frida-server', '/data/local/tmp']
+	adb_shell_command = ['adb', 'shell', 'su', '-c', 'chmod +x /data/local/tmp/frida-server']
+	result_push = run_command(adb_push_command, True, "Frida server copy to device")
+    
+	if result_push is not None:
+		result_shell = run_command(adb_shell_command, True, "Set permission for frida-server")  
+		if result_shell is not None:
+			return True
+		else:
+			return False
+	else:
 		return False
 
 
-def start_frida_server():
-	print_green("\n---> Start Frida Server...")
-	try:
-		subprocess.run(['adb', 'shell', 'su', '-c', '/data/local/tmp/frida-server &'], check=True)
-		print("Frida server started successfully.")
-	except FileNotFoundError:
-		print("ADB is not installed.")
-
-	except subprocess.CalledProcessError as e:
-		print_red("An error occurred while starting Frida server:: {}".format(str(e)))
-	except KeyboardInterrupt:
-		# Handle Ctrl+C keyboard interrupt
-		print("\nKeyboard interrupt detected. Exiting...")
-
-
+#=====================================================================================
+#Testing Frida connection
 def test_frida_connection():
 	print("\n---> Testing Frida Server connection...")
-	list_installed_packages_with_frida()
-		
+	list_running_applications_with_frida()
 
-def list_installed_packages_with_frida():
-	print("\n List running applications...")
-	try:
-		result = subprocess.run(['frida-ps', '-Ua'], capture_output=True, text=True, check=True)
-		package_list = result.stdout.splitlines()
-		for package in package_list:
-			print(package)
-		return package_list
-	except subprocess.CalledProcessError as e:
-		print_red("An error occurred while listing installed packages with Frida:: {}".format(str(e)))
-		return []
-	except KeyboardInterrupt:
-    		# Handle Ctrl+C keyboard interrupt
-			print("\nKeyboard interrupt detected. Exiting...")
+def list_running_processes_with_frida():
+    print('Command: frida-ps -U\n')
+    command = ['frida-ps', '-U']
+    run_command(command)
 
+def list_running_applications_with_frida():
+    print('Command: frida-ps -Ua\n')
+    command = ['frida-ps', '-Ua']
+    run_command(command)
 
-
+def list_installed_applications_with_frida():
+    print('Command: frida-ps -Uai\n')
+    command = ['frida-ps', '-Uai']
+    run_command(command)
 
 #=====================================================================================
-#Mange Frida
+#Manage Frida
 def check_frida_version():
-	try:
-		frida_version = subprocess.check_output(["frida", "--version"]).decode().strip()
-		print("Frida version on computer:", frida_version)
-		check_frida_server_version()
-	except FileNotFoundError:
-		print("Frida is not installed.")
-	except subprocess.CalledProcessError:
-		print("Failed to retrieve Frida version.")
+	command = ['frida', '--version']
+	run_command(command, False, "Frida version on computer")
 
-
-def check_frida_server_version():
-	try:
-		frida_version = subprocess.check_output(['adb', 'shell', 'su -c "/data/local/tmp/frida-server --version"'], universal_newlines=True)
-		print("Frida server version on Android:", frida_version)
-	except subprocess.CalledProcessError:
-		print("Failed to run ADB command.")
-
-
+	command = ['adb', 'shell', 'su -c "/data/local/tmp/frida-server --version"']
+	run_command(command, False, "Frida server version on Android")
 
 def stop_frida_server():
-	try:
-		subprocess.run(["adb", "shell", "su", "-c", "pkill", "frida-server"])
-		print("Frida server stopped successfully.")
-	except FileNotFoundError:
-		print("ADB is not installed.")
+	command = ["adb", "shell", "su", "-c", "pkill", "frida-server"]
+	run_command(command)
+
+def start_frida_server():
+	command = ['adb', 'shell', 'su', '-c', '/data/local/tmp/frida-server &']
+	run_command(command, True, "Start Frida Server")
+
 
 
 #=====================================================================================
-#Connection Testing
-def connect():
-	print("\nChecking Frida and Frida-Server connection")
-	test_frida_connection()
+#Usb Proxy
+def adb_shell_settings_put_global_http_proxy(proxy, cmd):
+    command = ['adb', 'shell', 'settings', 'put', 'global', 'http_proxy', proxy]
+    run_command(command, False, "ADB shell settings put global http_proxy: " + cmd)
+
+def adb_reverse(port, cmd):
+    command = ['adb', 'reverse', f'tcp:{port}', f'tcp:{port}']
+    run_command(command, False, "ADB reverse: " + cmd)
+
+def start_proxy():
+	adb_shell_settings_put_global_http_proxy(':0', "Clear USB Proxy")
+	adb_shell_settings_put_global_http_proxy('127.0.0.1:8080', "Set USB proxy")
+	adb_reverse('8080', "Set Port")
+
+def stop_proxy():
+	adb_shell_settings_put_global_http_proxy(':0', "Clear USB Proxy")
+
+#=====================================================================================
+#Execute command
+def run_command(command, shell=False, objecive=""):
+	try:
+		result = subprocess.run(command, capture_output=True, shell=shell)
+		if result.returncode == 0:
+			output = result.stdout.decode().strip()
+			print("Output:", objecive, output)
+			print("Command executed successfully.\n")
+			return output
+		else:
+			error = result.stderr.decode().strip()
+			print("Error:", objecive, error)
+			print("Command failed.\n")
+			return None
+	except subprocess.CalledProcessError as e:
+		print("An error occurred while executing the command: {}\n".format(str(e)))
+		return None
+	except KeyboardInterrupt:
+		print("\nKeyboard interrupt detected. Exiting...\n")
+		return None
 
 
 #=====================================================================================
 def install():
 	print("\nInsalling Frida and Frida-Server")
-	success1 = create_virtualenv('env')
-	if success1:
-		success2 = install_or_upgrade_frida_tools()
-		if success2:
+	if create_virtualenv('env') is not None:
+		if install_or_upgrade_frida_tools() is not None:
 			check_frida_version()
-			success3 = check_root_status()
-			if success3:
+			if check_root_status():
 				selected_cpu = check_android_cpu()
 				matching_download = match_cpu_architecture_with_download(cpu_architecture, cpu_download, selected_cpu)
 				if matching_download is not None:
 					download_url = download_frida_server_url(matching_download)
 					if download_url is not None:
-						success4 = download_frida(download_url, frida_zip)
-						if success4:
-							success5 = extract_xz(frida_zip, frida_name)
-							if success5:
-								success6 = copy_to_device()
-								if success6:
+						if download_frida(download_url, frida_zip):
+							if extract_xz(frida_zip, frida_name):
+								if copy_to_device():
 									start_frida_server()
 
 
@@ -312,7 +260,7 @@ cpu_download = [
 
 frida_zip = "frida-server.xz"
 frida_name = "frida-server"
-version = "Version 1.2"
+version = "Version 1.3"
 date_releae = "16/07/2023"
 
 
@@ -338,7 +286,8 @@ parser = argparse.ArgumentParser(description='Script description')
 # Add the command-line arguments
 parser.add_argument('--install', action='store_true', help='get ready to use Frida by installing it on your computer and setting up Frida Server on an Android device.')
 parser.add_argument('--connect', action='store_true', help='check Frida connection among a computer and an Android device')
-parser.add_argument('--frida', metavar='COMMAND', help='frida commands: version, stop, start')
+parser.add_argument('--frida', metavar='COMMAND', help='frida serfriver commands: version, stop, start')
+parser.add_argument('--proxy', metavar='COMMAND', help='USB proxy commands: stop, start')
 
 
 # Parse the command-line arguments
@@ -346,9 +295,9 @@ args = parser.parse_args()
 
 # Call the appropriate function based on the provided arguments
 if args.install:
-    install()
+	install()
 elif args.connect:
-    connect()
+	test_frida_connection()
 elif args.frida:
 	command = args.frida.lower()
 	if command == 'version':
@@ -359,10 +308,17 @@ elif args.frida:
 		start_frida_server()
 	else:
 		print("Invalid Frida command. Use --frida version, --frida stop, or --frida start.")
+elif args.proxy:
+	command = args.proxy.lower()
+	if command == 'stop':
+		stop_proxy()
+	elif command == 'start':
+		start_proxy()
+	else:
+		print("Invalid proxy command. Use --proxy stop or --proxy start.")
 else:
-    print("No valid command provided. Use --install or --connect.")
+	print("No valid command provided. Use --install, --frida, --connect, or --proxy.")
 
-				
 sys.exit(0)
 				
 
