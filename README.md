@@ -15,18 +15,24 @@
 ตัวอย่างการใช้งาน Command เพื่อติดตั้ง Frida
 
 ```
-python3 lazyfrida.py --install
+python3 lazyfrida.py --install frida
 ```
 
 ดูตัวอย่างการใช้งานอื่น ๆ 
 
 ```
-usage: lazyfrida.py [-h] [--install] [--connect] [--frida COMMAND]                                                                     
-Script description                                                                                   optional arguments:                       
-  -h, --help       show this help message and exit                             
-  --install        get ready to use Frida by installing it on your computer and setting up Frida Server on an Android device.           
-  --connect        check Frida connection among a computer and an Android device                     
-  --frida COMMAND  frida commands: version, stop, start
+positional arguments:
+  COMMAND          subcommands for --install
+    frida          install frida: Install Frida and Frida-server on Android Devices
+    cert           install cert [Burp IP]: Install Burp certificate as Android system level.
+                   By default, the optional [Burp IP] parameter is set to 127.0.0.1.
+
+optional arguments:
+  -h, --help       show this help message and exit
+  --install        install Frida-server or Install Burp certificate as system level
+  --connect        check Frida connection among a computer and an Android device
+  --frida COMMAND  frida server commands: version, stop, start
+  --proxy COMMAND  USB proxy commands: stop, start
 ```
 
 - News Feeds https://www.facebook.com/itselectlab/

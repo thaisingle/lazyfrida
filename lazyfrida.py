@@ -4,24 +4,26 @@ import urllib.request
 import lzma
 import argparse
 import sys
+import os
 
 
 def create_virtualenv(env_name):
 	print("\n---> Start creating environment...")
 
 	command = ['pip', 'install', 'virtualenv']
-	run_command(command,False,"Install virtualenv")
-
+	run_command(command, False, "Install virtualenv")
+    
 	command = ['virtualenv', env_name]
-	
 	run_command(command, False, "Create virtual environment")
+    
 	if platform.system() == 'Windows':
-		command = '{}\\Scripts\\activate'.format(env_name)
+		activate_cmd = '{}\\Scripts\\activate'.format(env_name)
 	else:
-		command = 'source {}/bin/activate'.format(env_name)
-	output = run_command([command], True, "Activate virtual environment")
-	
+		activate_cmd = '. {}/bin/activate'.format(env_name)
+    
+	output = run_command([activate_cmd], True, "Activate virtual environment")
 	return output
+
 
 
 def install_or_upgrade_frida_tools():
@@ -30,9 +32,12 @@ def install_or_upgrade_frida_tools():
 	return output
 
 
+
+
+
 def check_root_status():
 	command = ['adb', 'devices']
-	output = run_command(command, shell=False, objecive="ADB device check")
+	output = run_command(command, False, "ADB device check")
     
 	if output is not None and "List of devices attached" in output:
 		devices = output.split('\n')[1:]
@@ -41,7 +46,7 @@ def check_root_status():
 		for device in connected_devices:
 			print(device)
         
-		root_output = run_command(['adb', 'shell', 'su', '-c', 'id'], shell=False, objecive="Root status check")
+		root_output = run_command(['adb', 'shell', 'su', '-c', 'id'], False, "Root status check")
         
 		if root_output is not None and "uid=0" in root_output:
 			print("Device is rooted.")
@@ -118,7 +123,7 @@ def extract_xz(xz_path, extract_path):
 		with lzma.open(xz_path, 'rb') as xz_file:
 			with open(extract_path, 'wb') as extract_file:
 				extract_file.write(xz_file.read())
-		print("XZ file extracted successfully.")
+		print("XZ file extracted successfully.\n")
 		return True
 	except Exception as e:
 		print("An error occurred while extracting the XZ file: {}".format(str(e)))
@@ -126,18 +131,13 @@ def extract_xz(xz_path, extract_path):
 
 
 def copy_to_device():
-	adb_push_command = ['adb', 'push', 'frida-server', '/data/local/tmp']
-	adb_shell_command = ['adb', 'shell', 'su', '-c', 'chmod +x /data/local/tmp/frida-server']
-	result_push = run_command(adb_push_command, True, "Frida server copy to device")
-    
-	if result_push is not None:
-		result_shell = run_command(adb_shell_command, True, "Set permission for frida-server")  
-		if result_shell is not None:
-			return True
-		else:
-			return False
-	else:
-		return False
+	command = ['adb', 'push', 'frida-server', '/data/local/tmp']
+	output = run_command(command, True, "Frida server copy to device")
+	
+	if output is not None:
+		command = ['adb', 'shell', 'su', '-c', 'chmod +x /data/local/tmp/frida-server']
+		output = run_command(command, True, "Set permission for frida-server")
+	return output
 
 
 #=====================================================================================
@@ -198,19 +198,20 @@ def start_proxy():
 def stop_proxy():
 	adb_shell_settings_put_global_http_proxy(':0', "Clear USB Proxy")
 
+
 #=====================================================================================
 #Execute command
-def run_command(command, shell=False, objecive=""):
+def run_command(command, shell=False, objective=""):
 	try:
 		result = subprocess.run(command, capture_output=True, shell=shell)
 		if result.returncode == 0:
 			output = result.stdout.decode().strip()
-			print("Output:", objecive, output)
+			print("Output:", objective, output)
 			print("Command executed successfully.\n")
 			return output
 		else:
-			error = result.stderr.decode().strip()
-			print("Error:", objecive, error)
+			error = result.stderr.strip() if result.stderr else result.stdout.strip()
+			print("Error:", objective, error)
 			print("Command failed.\n")
 			return None
 	except subprocess.CalledProcessError as e:
@@ -222,7 +223,7 @@ def run_command(command, shell=False, objecive=""):
 
 
 #=====================================================================================
-def install():
+def install_frida():
 	print("\nInsalling Frida and Frida-Server")
 	if create_virtualenv('env') is not None:
 		if install_or_upgrade_frida_tools() is not None:
@@ -235,10 +236,62 @@ def install():
 					if download_url is not None:
 						if download_frida(download_url, frida_zip):
 							if extract_xz(frida_zip, frida_name):
-								if copy_to_device():
+								if copy_to_device() is not None:
 									start_frida_server()
 
 
+
+#=====================================================================================
+#Installin CA certification of Burp as system level.
+
+def download_cert(ip_address):
+    # Download the DER certificate file
+    curl_command = f'curl --proxy http://{ip_address}:8080 -o cacert.der http://burp/cert'
+    output = run_command(curl_command, True, "Downloading the certificate file")
+    if output is None: print("Please check if your Burp Suite is properly configured and running")
+    return output
+
+def install_cert():
+	command = 'openssl x509 -inform DER -in cacert.der -out cacert.pem'
+	output = run_command(command, True, "Converting DER to PEM format")
+
+	if output is not None:
+		command = "openssl x509 -inform PEM -subject_hash_old -in cacert.pem | head -1"
+		cert_hash = run_command(command, True, "Extracting the subject hash")
+
+	if output is not None:
+		rename_command = f'cp cacert.pem {cert_hash}.0'
+		output = run_command(rename_command, True, "Renaming the PEM file")
+
+	if output is not None:
+		command = f'adb shell su -c "mount -o rw,remount /" && adb push {cert_hash}.0 /sdcard/Download/'
+		output = run_command(command, True, "Pushing the certificate to the device")
+
+	if output is not None:
+		command = f'adb shell su -c "cp /sdcard/Download/{cert_hash}.0 /system/etc/security/cacerts/{cert_hash}.0"'
+		output = run_command(command, True, "Copying the certificate to the system cacerts directory")
+
+	if output is not None:
+		command = f'adb shell su -c "chmod 644 /system/etc/security/cacerts/{cert_hash}.0"'
+		output = run_command(command, True, "Setting permissions for the certificate")
+	return output
+
+
+def reboot_device():
+    command = ['adb', 'reboot']
+    run_command(command, False, "Reboots the device")
+
+
+def install_certificate(ip_address):
+	if check_root_status():
+		if download_cert(ip_address) is not None:
+			if install_cert() is not None:
+				reboot_device()
+
+			
+		
+
+	
 
 #===================================================
 #===================================================
@@ -260,8 +313,8 @@ cpu_download = [
 
 frida_zip = "frida-server.xz"
 frida_name = "frida-server"
-version = "Version 1.3"
-date_releae = "16/07/2023"
+version = "Version 1.4"
+date_releae = "18/07/2023"
 
 
 title = r'''
@@ -280,22 +333,42 @@ print(date_releae)
 print("Created by Warunyou Sunpachit and Boonperm mark Akaradesh")
 print("https://blog.itselectlab.com\n")
 
+
 # Create the argument parser
-parser = argparse.ArgumentParser(description='Script description')
+parser = argparse.ArgumentParser(description='Script description', formatter_class=argparse.RawTextHelpFormatter)
 
 # Add the command-line arguments
-parser.add_argument('--install', action='store_true', help='get ready to use Frida by installing it on your computer and setting up Frida Server on an Android device.')
-parser.add_argument('--connect', action='store_true', help='check Frida connection among a computer and an Android device')
-parser.add_argument('--frida', metavar='COMMAND', help='frida serfriver commands: version, stop, start')
-parser.add_argument('--proxy', metavar='COMMAND', help='USB proxy commands: stop, start')
+parser.add_argument('--install', action='store_true', help='install Frida-server or Install Burp certificate as system level')
 
+# Create subparsers for the install command
+install_subparsers = parser.add_subparsers(dest='install_command', required='--install' in sys.argv, metavar='COMMAND', help='subcommands for --install')
+
+# Create subparser for the 'frida' subcommand
+frida_parser = install_subparsers.add_parser('frida', help='install frida: Install Frida and Frida-server on Android Devices')
+
+# Create subparser for the 'certificate' subcommand
+cert_parser = install_subparsers.add_parser('cert', help='install cert [Burp IP]: Install Burp certificate as Android system level. \nBy default, the optional [Burp IP] parameter is set to 127.0.0.1.')
+
+# Create subparser for the 'certificate' subcommand 
+cert_parser.add_argument('ip', nargs='?', default='127.0.0.1', help='IP address for certificate installation (default: %(default)s)')
+
+
+parser.add_argument('--connect', action='store_true', help='check Frida connection among a computer and an Android device')
+parser.add_argument('--frida', metavar='COMMAND', help='frida server commands: version, stop, start')
+parser.add_argument('--proxy', metavar='COMMAND', help='USB proxy commands: stop, start')
 
 # Parse the command-line arguments
 args = parser.parse_args()
 
 # Call the appropriate function based on the provided arguments
 if args.install:
-	install()
+	if args.install_command == 'frida':
+		install_frida()
+	elif args.install_command == 'cert':
+		ip_address = args.ip
+		install_certificate(ip_address)
+	else:
+		print("No valid subcommand provided for --install.")
 elif args.connect:
 	test_frida_connection()
 elif args.frida:
