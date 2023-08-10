@@ -9,6 +9,7 @@ import shutil
 
 
 
+
 def create_virtualenv(env_name):
 	print("\n---> Start creating environment...")
 
@@ -34,8 +35,24 @@ def install_or_upgrade_frida_tools():
 	return output
 
 
+def is_emulator():
+	# Check if it's an emulator or a real device
+	command = ['adb', 'shell', 'getprop', 'ro.build.characteristics']
+	output = run_command(command, False, "Device type check")
+
+	# Check if the output contains the word "emulator"
+	return 'emulator' in output.lower()
+
+
 def check_root():
-	command = ['adb', 'shell', 'su', '-c', 'id']
+	# Check if it's an emulator or a real device
+	if is_emulator():
+		# It's an emulator
+		command = ['adb', 'shell', 'su', '0', 'id']
+	else:
+		# It's a real device
+		command = ['adb', 'shell', 'su', '-c', 'id']
+
 	output = run_command(command, False, "Root status check")
 	return output
 
@@ -111,9 +128,16 @@ def extract_xz(xz_path, extract_path):
 def copy_to_device():
 	command = ['adb', 'push', 'frida-server', '/data/local/tmp']
 	output = run_command(command, True, "Frida server copy to device")
-	
+    
 	if output is not None:
-		command = ['adb', 'shell', 'su', '-c', 'chmod +x /data/local/tmp/frida-server']
+		 # Check if it's an emulator or a real device
+		if is_emulator():
+            # It's an emulator
+			command = ['adb', 'shell', 'su', '0', 'chmod +x /data/local/tmp/frida-server']
+		else:
+			# It's a real device
+			command = ['adb', 'shell', 'su', '-c', 'chmod +x /data/local/tmp/frida-server']
+
 		output = run_command(command, True, "Set permission for frida-server")
 	return output
 
@@ -154,13 +178,31 @@ def check_frida_version():
 
 def stop_frida_server():
 	if check_adb() is not None:
-		command = ['adb', 'shell', 'su -c "pkill frida-server"']
-		run_command(command, True, "Stop Frida server")
+		if is_emulator():
+			# Emulator
+			find_command = ['adb', 'shell', 'ps', '-A | grep frida-server']
+			kill_command = ['adb', 'shell', 'su 0 kill $(pidof frida-server)']
+		else:
+			# Device
+			find_command = ['adb', 'shell', 'ps', '-A | grep frida-server']
+			kill_command = ['adb', 'shell', 'su -c "pkill frida-server"']
+
+		run_command(find_command, True, "Find Frida server")
+		run_command(kill_command, True, "Stop Frida server")
+
+
 
 def start_frida_server():
 	if check_adb() is not None:
-		command = ['adb', 'shell', 'su', '-c', '/data/local/tmp/frida-server &']
-		run_command(command, True, "Start Frida server")
+		# Check if it's an emulator or a real device
+		if is_emulator():
+			# It's an emulator
+			start_command = ['adb', 'shell', 'su', '0', '/data/local/tmp/frida-server &']
+		else:
+			# It's a real device
+			start_command = ['adb', 'shell', 'su', '-c', '/data/local/tmp/frida-server &']
+	    
+		run_command(start_command, True, "Start Frida server")
 
 
 
@@ -223,20 +265,40 @@ def run_command(command, shell=False, objective=""):
 #=====================================================================================
 def install_frida():
 	print("\nInsalling Frida and Frida-Server")
-	if create_virtualenv('env') is not None:
-		if install_or_upgrade_frida_tools() is not None:
-			check_frida_version()
-			if check_adb() is not None:
-				if check_root() is not None:
-					selected_cpu = check_android_cpu()
-					matching_download = match_cpu_architecture_with_download(cpu_architecture, cpu_download, selected_cpu)
-					if matching_download is not None:
-						download_url = download_frida_server_url(matching_download)
-						if download_url is not None:
-							if download_frida(download_url, frida_zip):
-								if extract_xz(frida_zip, frida_name):
-									if copy_to_device() is not None:
-										start_frida_server()
+
+
+	output = create_virtualenv('env')
+
+	if output is not None:
+		output = install_or_upgrade_frida_tools()
+	
+	if output is not None:
+		check_frida_version()
+		output = check_adb()
+	
+	if output is not None:
+		output = check_root()
+
+	if output is not None:
+		selected_cpu = check_android_cpu()
+		matching_download = match_cpu_architecture_with_download(cpu_architecture, cpu_download, selected_cpu)
+
+	if matching_download is not None:
+		download_url = download_frida_server_url(matching_download)
+
+	if download_url is not None:
+		output = download_frida(download_url, frida_zip)
+	
+	if output == True:
+		output = extract_xz(frida_zip, frida_name)
+	
+	if output == True:
+		output = copy_to_device()
+	
+	if output is not None:
+		start_frida_server()
+		print("\nAll Insalled Frida and Frida-Server Successfully.")
+
 
 
 
@@ -390,7 +452,7 @@ def patch_apk_frida2():
 		output = run_command(command, False, "Decompile")
 
 
-	copy_frida_gadget_to_apk(frida_gadget_name, apktool_d_folder, selected_cpu)
+	#copy_frida_gadget_to_apk(frida_gadget_name, apktool_d_folder, selected_cpu)
 	
 		
 def patch_apk_frida():

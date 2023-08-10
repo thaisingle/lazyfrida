@@ -1,38 +1,45 @@
 # **LazyFrida**
 
-## อุปกรณ์จัดเตรียม
+## Preparation
 
-- เครื่อง Android Device ที่ Root เรียบร้อยแล้ว
-- เปิด USB debugging แล้ว (แต่ละเครื่องอาจการเข้าเมนู Developer options ไม่เหมือนกัน)
-- สาย USB
-- ลง Python3
-- ลง PIP
+- Android device that has been successfully rooted.
+- USB debugging is enabled (accessing the Developer options menu may vary for each device).
+- USB cable.
+- Installed Python3.
+- Installed PIP.
 
-## ตัวอย่างการใช้งาน
+## Usage examples
 
-สำหรับคำสั่งรวดเดียวตั้งแต่ดาวน์โหลดติดตั้งเชื่อมต่อสามารถใช้งาน LazyFrida ดังนี้
+For a single command, from download, installation, to connection, you can use LazyFrida as follows:
 
-ตัวอย่างการใช้งาน Command เพื่อติดตั้ง Frida
+Example of using a command to install Frida.
 
 ```
-python3 lazyfrida.py --install frida
+python3 lazyfrida.py install-frida
 ```
 
-ดูตัวอย่างการใช้งานอื่น ๆ 
+See other usage examples.
 
 ```
 positional arguments:
-  COMMAND          subcommands for --install
-    frida          install frida: Install Frida and Frida-server on Android Devices
-    cert           install cert [Burp IP]: Install Burp certificate as Android system level.
-                   By default, the optional [Burp IP] parameter is set to 127.0.0.1.
+  {install-frida,install-cert,patch-apk}
+                        installation commands
+    install-frida       installs frida and frida-server on Android
+    install-cert        installs CA Burp suite certificate
+                        defines [ip] of Burp Suite: default: 127.0.0.1
+    patch-apk           installs frida gadget to apk
 
-optional arguments:
-  -h, --help       show this help message and exit
-  --install        install Frida-server or Install Burp certificate as system level
-  --connect        check Frida connection among a computer and an Android device
-  --frida COMMAND  frida server commands: version, stop, start
-  --proxy COMMAND  USB proxy commands: stop, start
+options:
+  -h, --help            show this help message and exit
+  -q [QUERY ...], --query [QUERY ...]
+                        connects to frida server and accepts multiple parameters.
+                        potential parameters: apps, proc, runn
+  -u USB_PROXY [USB_PROXY ...], --usb-proxy USB_PROXY [USB_PROXY ...]
+                        start and stop the usb proxy
+                        potential parameters: start, stop
+  -f FRIDA [FRIDA ...], --frida FRIDA [FRIDA ...]
+                        start, stop, check version of frida server
+                        potential parameters: start, stop, version
 ```
 
 - News Feeds https://www.facebook.com/itselectlab/
