@@ -6,6 +6,8 @@ import argparse
 import sys
 import os
 import shutil
+import re
+import xml.etree.ElementTree as ET
 
 
 
@@ -353,6 +355,7 @@ def install_certificate(ip_address):
 		
 #=====================================================================================
 #Inject a Frida gadget into an APK.
+#Download component
 def download_file(download_url, output_path):
 	try:
 		print("\nPlease Wait... - Download", output_path, "\n", download_url )
@@ -368,10 +371,10 @@ def download_file(download_url, output_path):
 #Check if a file at the specified path exists.
 def check_file_exists(file_path):
     if os.path.exists(file_path):
-        print('File exists')
+        print('File exists - ' + file_path)
         return True
     else:
-        print('File does not exist')
+        print('File does not exist - ' + file_path)
         return False
 
 
@@ -406,31 +409,41 @@ def extract_xz2(xz_path, extract_path):
 		return None
 	
 
-def copy_frida_gadget_to_apk(gadget_path, apk_path, architecture):
-    # Construct the destination path
-    destination_path = os.path.join(apk_path, "lib", architecture)
 
-    # Create the destination directory if it does not exist
-    if not os.path.exists(destination_path):
-        os.makedirs(destination_path)
-
-    # Copy the file
-    try:
-        shutil.copy2(gadget_path, destination_path)
-        print(f"Copied {gadget_path} to {destination_path}")
-    except Exception as e:
-        print(f"Error occurred while copying: {str(e)}")
-
-
+def download_user_server_url():
+	print("\nStart checking uber-apk-signer Download URL...")
+    
+	command = 'curl -s https://api.github.com/repos/patrickfav/uber-apk-signer/releases/latest | grep "browser_download_url" | grep ".jar"'
+	result = run_command(command, True, "Download URL retrieval")
+    
+	if result is not None and result.strip():
+		output = result.strip()
+		download_url = output.split('"')[3]
+		print("Download URL:", download_url + "\n")
+		return download_url
+	else:
+		return None
 
 
-def download_frida_gadget():
+def download_component():
 	#Check APK Tool
 	if check_file_exists(apktool_name) == False:
 		output = download_file(apktool_download_url, apktool_name)
-	
-	#Find Frida gadget Download Link
-	selected_cpu = check_android_cpu()
+	else:
+		output = "Passed"
+
+	#Check Uber Tool
+	if check_file_exists(uber_name) == False:
+		uber_download_url = download_user_server_url()
+		output = download_file(uber_download_url, uber_name)
+	else:
+		output = "Passed"
+	print('Verified that every file should be present\n')
+	return output
+
+
+
+def download_frida_gadget(selected_cpu):
 	output = match_cpu_architecture_with_download(cpu_architecture, cpu_download, selected_cpu)
 	if output is not None:
 		output = frida_gadget_url(output)
@@ -446,65 +459,239 @@ def download_frida_gadget():
 
 	return output
 
-def patch_apk_frida2():
-	if output is not None:
-		command = ['java', '-jar', apktool_name, 'd', '-r' , '-f', 'origin.apk', '-o', 'output']
-		output = run_command(command, False, "Decompile")
 
 
-	#copy_frida_gadget_to_apk(frida_gadget_name, apktool_d_folder, selected_cpu)
-	
-		
-def patch_apk_frida():
-	file_path = find_file('MainActivity.smali', 'output')
-	if file_path is None:
-		print('File not found')
+#Decompile APK
+def remove_output_folder(path='.'):
+	output_path = os.path.join(path, apktool_d_folder)
+    
+	if os.path.exists(output_path) and os.path.isdir(output_path):
+		shutil.rmtree(output_path)
+		print(f'Removed folder: {output_path}\n')
 	else:
-		print('File found at:', file_path)
-	
-	print("test1")
-	command = ['java', '-jar', apktool_name, 'b', 'output' , '-o', 'origin_patch.apk']
-	output = run_command(command, False, "Compile.....")
+		print(f'Folder "output" not found in {path}.\n')
 
-	#print("test2")
-	command = ['java', '-jar', 'uber-apk-signer-1.3.0.jar', '--apks', 'origin_patch.apk']
-	output = run_command(command, False, "Signing App.....")
+def decompileAPK(apk_path):
+	output = check_file_exists(apk_path)
 
-	#print("test3")
-	command = ['adb', 'install', 'origin_patch-aligned-debugSigned.apk']
-	output = run_command(command, False, "Install patched app.....")
-
+	if output == True:
+		print('Start decompiling ' + apk_path)
+		command = ['java', '-jar', apktool_name, 'd', '-f', '--use-aapt2', apk_path, '-o', apktool_d_folder]
+		output = run_command(command, True, "Decompile")
+	else:
+		output = None
+	return output
 
 
+#Copy Frida gadget to Lib based on Architecture
+def copy_frida_gadget_to_apk(gadget_path, apk_path, architecture):
+	# Construct the destination path
+	destination_path = os.path.join(apk_path, "lib", architecture)
+
+	# Create the destination directory if it does not exist
+	if not os.path.exists(destination_path):
+		os.makedirs(destination_path)
+
+	# Copy the file
+	try:
+		shutil.copy2(gadget_path, destination_path)
+		return "Passed"
+		print(f"Copied {gadget_path} to {destination_path}")
+	except Exception as e:
+		return None
+		print(f"Error occurred while copying: {str(e)}")
 
 
-#.method static constructor <clinit>()V
-#    .locals 1
-
-#    .prologue
-#    const-string v0, "frida-gadget"
-
-#    invoke-static {v0}, Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V
-
-#    return-void
-#.end method
-
-
-#When decoding: apktool d --use-aapt2 my_app.apk
-#When building: apktool b --use-aapt2 my_app
-
-#aapt dump badging SSLPinningExample.apk  | grep launchable-activity
-
-#android:extractNativeLibs="true"
-	
-
-
-
+#Discover launchable A ctivity (Smali File)
 def find_file(filename, search_path):
 	for root, dir, files in os.walk(search_path):
 		if filename in files:
 			return os.path.join(root, filename)
 	return None
+
+def get_launchable_activity(apk_path):
+	# Step 1: Run the aapt command and get the output
+	#aapt dump badging apk_path | grep launchable-activity
+	command = ['aapt', 'dump', 'badging', apk_path, '|', 'grep', 'launchable-activity']
+	output = run_command(command, True, "Run the aapt command and get the output")
+
+	# Step 2: Extract the launchable activity name
+	prefix = "launchable-activity: name='"
+	suffix = "'"
+	start = output.find(prefix)
+	if start == -1:
+		print("Error: Could not find the launchable-activity in the output.")
+		return None
+
+	start += len(prefix)
+	end = output.find(suffix, start)
+	full_activity_name = output[start:end]
+	activity_name = full_activity_name.split('.')[-1]
+
+	# Step 3: Construct the path to the .smali file
+	output = os.path.join(activity_name + ".smali")
+	return output
+
+
+
+#Edit code
+
+def insert_or_replace_code_block(file_path):
+	if check_file_exists(file_path) == False:
+		return None
+
+
+	# Define the code block to be inserted or replaced
+	code_block = '''.method static constructor <clinit>()V
+	.locals 1
+
+ 	.prologue
+	const-string v0, "frida-gadget"
+
+	invoke-static {v0}, Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V
+
+	return-void
+	.end method
+	'''
+
+	with open(file_path, 'r') as file:
+		content = file.read()
+
+	# Check if the method already exists in the file
+	if '.method static constructor <clinit>()V' in content:
+		# If it does, replace everything from the method declaration to its end with the code block
+		content_modified = re.sub(r'\.method static constructor <clinit>\(\)V.*?\.end method', code_block, content, flags=re.DOTALL)
+	else:
+		# If not, just append the new method to the end of the file
+		content_modified = content + "\n" + code_block
+
+	# Write the modified content back to the file
+	with open(file_path, 'w') as file:
+		file.write(content_modified)
+
+	print(f"Code block inserted or replaced in {file_path}.\n")
+	return "Passed"
+
+
+
+
+def modify_android_manifest(manifest_path):
+	# Parse the AndroidManifest.xml file.
+	tree = ET.parse(manifest_path)
+	root = tree.getroot()
+
+	# The namespace for Android.
+	ns = {'android': 'http://schemas.android.com/apk/res/android'}
+
+	# Explicitly register the namespace prefix
+	ET.register_namespace('android', ns['android'])
+
+	# Find the 'application' tag.
+	application_elem = root.find('./application', namespaces=ns)
+
+	if application_elem is not None:
+		# Check if 'android:extractNativeLibs' attribute exists.
+		extract_native_libs = application_elem.get('{http://schemas.android.com/apk/res/android}extractNativeLibs')
+        
+		if extract_native_libs is not None:
+			# If the attribute exists, set it to "true".
+			application_elem.set('{http://schemas.android.com/apk/res/android}extractNativeLibs', "true")
+		else:
+			# If the attribute does not exist, add it and set to "true".
+			application_elem.attrib["{http://schemas.android.com/apk/res/android}extractNativeLibs"] = "true"
+
+		# Save the changes back to the file.
+		tree.write(manifest_path, encoding='utf-8', xml_declaration=True)
+		print("Android Manifest.xml has been successfully modified.\n")
+		return "Passed"
+	else:
+		print("Error: <application> tag not found in the AndroidManifest.xml file.\n")
+		return None
+
+
+
+#Compile APK
+def get_modified_filename(apk_path, suffix='_patched'):
+	# Split the file path into directory and filename
+	dir_name, file_name = os.path.split(apk_path)
+    
+	# Split the filename into name and extension
+	base_name, ext = os.path.splitext(file_name)
+
+	# Append the suffix to the name and rejoin with the extension
+	modified_name = f"{base_name}{suffix}{ext}"
+
+	# Join directory with the new filename to get the full path
+	modified_path = os.path.join(dir_name, modified_name)
+
+	return modified_path
+
+
+
+def compileAPK(apk_path):
+	print('Start compile')
+	command = ['java', '-jar', apktool_name, 'b', '-f', '--use-aapt2', apktool_d_folder, '-o', get_modified_filename(apk_path)]
+	output = run_command(command, True, "Compile....")
+	return output
+
+
+def signAPK(apk_path):
+	print('Start compile')
+	command = ['java', '-jar', uber_name, '--apks', get_modified_filename(apk_path)]
+	output = run_command(command, True, "Signing App.....")
+	return output
+
+
+def installAPK(apk_path):
+	print('Start install signed app')
+	command = ['adb', 'install',  get_modified_filename(apk_path, '_patched-aligned-debugSigned')]
+	output = run_command(command, True, "Intall App.....")
+	return output
+
+
+
+def patch_apk_frida(apk_path):
+	output = download_component()
+
+	if output is not None:
+		selected_cpu = check_android_cpu()
+
+	if output is not None:
+		output = download_frida_gadget(selected_cpu)
+	
+	if output is not None:
+		remove_output_folder(dir_app)
+		output = decompileAPK(apk_path)
+	
+	if output is not None:
+		output = copy_frida_gadget_to_apk(frida_gadget_name, apktool_d_folder, selected_cpu)	
+
+	if output is not None:
+		output = get_launchable_activity(apk_path)
+
+	if output is not None:	
+		output = find_file(output, apktool_d_folder)
+
+	if output is not None:
+		output = insert_or_replace_code_block(output)
+	
+	if output is not None:
+		output = modify_android_manifest(apktool_d_folder_Manifest)
+	
+	if output is not None:
+		output = compileAPK(apk_path)
+	
+	if output is not None:
+		output = signAPK(apk_path)
+
+	installAPK(apk_path)
+
+
+
+
+	
+
+
 
 
 
@@ -546,6 +733,10 @@ apktool_name = "apktool.jar"
 apktool_version = "2.8.0"
 apktool_download_url = f'https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_{apktool_version}.jar'
 apktool_d_folder = "output"
+apktool_d_folder_Manifest = apktool_d_folder + "/AndroidManifest.xml"
+
+#Uber
+uber_name =  "uber-apk-signer.jar"  
 
 #system Certificate Authority (CA) certificates
 dir_sytem_cert = "/system/etc/security/cacerts/"
@@ -553,7 +744,7 @@ dir_user_cert = "/data/misc/user/0/cacerts-added/"
 
 #LazyFrida
 version = "Version 1.7"
-date_releae = "20/07/2023"
+date_releae = "12/08/2023"
 
 
 title = r'''
@@ -590,9 +781,8 @@ def main():
 	cert_parser.add_argument('ip_address', nargs='?', default='127.0.0.1', help='IP address to install cert on (default: 127.0.0.1)')
 
 
-
 	patch_apk_parser = subparsers.add_parser('patch-apk', help='installs frida gadget to apk')
-	#patch_apk_parser.add_argument('apk_path', type=str, help='The full path to the APK file including the filename')
+	patch_apk_parser.add_argument('apk_path', type=str, help='The full path to the APK file including the filename')
 
 
 	#=====================================================================================
@@ -614,7 +804,7 @@ def main():
 	elif args.command == 'install-cert':
 		install_certificate(args.ip_address)
 	elif args.command == 'patch-apk':
-		patch_apk_frida()
+		patch_apk_frida(args.apk_path)
 
 
 	if args.query:
