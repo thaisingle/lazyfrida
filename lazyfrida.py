@@ -8,6 +8,7 @@ import os
 import shutil
 import re
 import xml.etree.ElementTree as ET
+import frida
 
 
 
@@ -461,28 +462,6 @@ def download_frida_gadget(selected_cpu):
 
 
 
-#Decompile APK
-def remove_output_folder(path='.'):
-	output_path = os.path.join(path, apktool_d_folder)
-    
-	if os.path.exists(output_path) and os.path.isdir(output_path):
-		shutil.rmtree(output_path)
-		print(f'Removed folder: {output_path}\n')
-	else:
-		print(f'Folder "output" not found in {path}.\n')
-
-def decompileAPK(apk_path):
-	output = check_file_exists(apk_path)
-
-	if output == True:
-		print('Start decompiling ' + apk_path)
-		command = ['java', '-jar', apktool_name, 'd', '-f', '--use-aapt2', apk_path, '-o', apktool_d_folder]
-		output = run_command(command, True, "Decompile")
-	else:
-		output = None
-	return output
-
-
 #Copy Frida gadget to Lib based on Architecture
 def copy_frida_gadget_to_apk(gadget_path, apk_path, architecture):
 	# Construct the destination path
@@ -535,8 +514,7 @@ def get_launchable_activity(apk_path):
 
 
 #Edit code
-
-def insert_or_replace_code_block(file_path):
+def insert_or_replace_code_block2(file_path):
 	if check_file_exists(file_path) == False:
 		return None
 
@@ -574,6 +552,50 @@ def insert_or_replace_code_block(file_path):
 
 
 
+def insert_or_replace_code_block(file_path):
+	if check_file_exists(file_path) == False:
+		return None
+
+
+	# Code block to be inserted
+	add_code = '''const-string v0, "frida-gadget"
+	
+	invoke-static {v0}, Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V
+
+	'''
+
+	insert_code = '''.method static constructor <clinit>()V
+	.locals 1
+
+ 	.prologue
+	const-string v0, "frida-gadget"
+
+	invoke-static {v0}, Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V
+
+	return-void
+	.end method
+	'''
+
+	with open(file_path, 'r') as file:
+		content = file.read()
+
+    # Check if the method already exists in the file
+	if '.method static constructor <clinit>()V' in content:
+		pattern = r'(\.method static constructor <clinit>\(\)V.*?)(return-void)'
+		content_modified = re.sub(pattern, r'\1' + add_code + r'\2', content, flags=re.DOTALL)
+
+	else:
+		# If not, just append the new method to the end of the file
+		content_modified = content + "\n" + insert_code
+
+	# Write the modified content back to the file
+	with open(file_path, 'w') as file:
+		file.write(content_modified)
+
+	print(f"Code block inserted in {file_path}.\n")
+	return "Passed"
+
+
 
 def modify_android_manifest(manifest_path):
 	# Parse the AndroidManifest.xml file.
@@ -586,68 +608,58 @@ def modify_android_manifest(manifest_path):
 	# Explicitly register the namespace prefix
 	ET.register_namespace('android', ns['android'])
 
-	# Find the 'application' tag.
+	# Modify android:extractNativeLibs attribute in the application tag
 	application_elem = root.find('./application', namespaces=ns)
-
 	if application_elem is not None:
-		# Check if 'android:extractNativeLibs' attribute exists.
 		extract_native_libs = application_elem.get('{http://schemas.android.com/apk/res/android}extractNativeLibs')
-        
 		if extract_native_libs is not None:
-			# If the attribute exists, set it to "true".
 			application_elem.set('{http://schemas.android.com/apk/res/android}extractNativeLibs', "true")
 		else:
-			# If the attribute does not exist, add it and set to "true".
 			application_elem.attrib["{http://schemas.android.com/apk/res/android}extractNativeLibs"] = "true"
 
-		# Save the changes back to the file.
-		tree.write(manifest_path, encoding='utf-8', xml_declaration=True)
-		print("Android Manifest.xml has been successfully modified.\n")
-		return "Passed"
+	# Save the changes back to the file.
+	tree.write(manifest_path, encoding='utf-8', xml_declaration=True)
+	print("Android Manifest.xml has been successfully modified.")
+	return "Passed"
+
+
+def modify_element_attribute(element, attribute, value, ns):
+    #Helper function to modify the attribute of a given XML element.
+	attr_value = element.get(attribute)
+	if attr_value is not None:
+		element.set(attribute, value)
 	else:
-		print("Error: <application> tag not found in the AndroidManifest.xml file.\n")
-		return None
+		element.attrib[attribute] = value
 
 
+def modify_android_manifest2(manifest_path):
+	# Parse the AndroidManifest.xml file.
+	tree = ET.parse(manifest_path)
+	root = tree.getroot()
 
-#Compile APK
-def get_modified_filename(apk_path, suffix='_patched'):
-	# Split the file path into directory and filename
-	dir_name, file_name = os.path.split(apk_path)
-    
-	# Split the filename into name and extension
-	base_name, ext = os.path.splitext(file_name)
+	# The namespace for Android.
+	ns = {'android': 'http://schemas.android.com/apk/res/android'}
+	android_ns = ns['android']
 
-	# Append the suffix to the name and rejoin with the extension
-	modified_name = f"{base_name}{suffix}{ext}"
+	# Modify android:extractNativeLibs attribute in the application tag
+	modify_element_attribute(
+		root.find('./application', namespaces=ns),
+		f'{{{android_ns}}}extractNativeLibs',
+		"true",
+		ns
+	)
 
-	# Join directory with the new filename to get the full path
-	modified_path = os.path.join(dir_name, modified_name)
+	modify_element_attribute(
+		root.find('./application', namespaces=ns),
+		f'{{{android_ns}}}testOnly',
+		"false",
+		ns
+	)
 
-	return modified_path
-
-
-
-def compileAPK(apk_path):
-	print('Start compile')
-	command = ['java', '-jar', apktool_name, 'b', '-f', '--use-aapt2', apktool_d_folder, '-o', get_modified_filename(apk_path)]
-	output = run_command(command, True, "Compile....")
-	return output
-
-
-def signAPK(apk_path):
-	print('Start compile')
-	command = ['java', '-jar', uber_name, '--apks', get_modified_filename(apk_path)]
-	output = run_command(command, True, "Signing App.....")
-	return output
-
-
-def installAPK(apk_path):
-	print('Start install signed app')
-	command = ['adb', 'install',  get_modified_filename(apk_path, '_patched-aligned-debugSigned')]
-	output = run_command(command, True, "Intall App.....")
-	return output
-
+	# Save the changes back to the file.
+	tree.write(manifest_path, encoding='utf-8', xml_declaration=True)
+	print("Android Manifest.xml has been successfully modified.")
+	return "Passed"
 
 
 def patch_apk_frida(apk_path):
@@ -684,18 +696,136 @@ def patch_apk_frida(apk_path):
 	if output is not None:
 		output = signAPK(apk_path)
 
-	installAPK(apk_path)
+	if output is not None:
+		installAPK(apk_path)
 
 
+#=====================================================================================
+#Decompile and Compile
+#Decompile APK
+def remove_output_folder(path='.'):
+	output_path = os.path.join(path, apktool_d_folder)
+    
+	if os.path.exists(output_path) and os.path.isdir(output_path):
+		shutil.rmtree(output_path)
+		print(f'Removed folder: {output_path}\n')
+	else:
+		print(f'Folder "output" not found in {path}.\n')
 
+def decompileAPK(apk_path, use_aapt2):
+	output = check_file_exists(apk_path)
 
+	if output == True:
+		print('Start decompiling ' + apk_path)
+
+		if use_aapt2:
+			command = ['java', '-jar', apktool_name, 'd', '-f', '--use-aapt2', apk_path, '-o', apktool_d_folder]
+		else:
+			command = ['java', '-jar', apktool_name, 'd', '-f', apk_path, '-o', apktool_d_folder]
+		output = run_command(command, True, "Decompile")
+	else:
+		output = None
+	return output
 	
 
+#Compile APK
+def get_modified_filename(apk_path, suffix='_patched'):
+	# Split the file path into directory and filename
+	dir_name, file_name = os.path.split(apk_path)
+    
+	# Split the filename into name and extension
+	base_name, ext = os.path.splitext(file_name)
+
+	# Append the suffix to the name and rejoin with the extension
+	modified_name = f"{base_name}{suffix}{ext}"
+
+	# Join directory with the new filename to get the full path
+	modified_path = os.path.join(dir_name, modified_name)
+
+	return modified_path
 
 
 
+#========
+def compileAPK(apk_path, use_aapt2):
+	print('Start compile')
+
+	if use_aapt2:
+		command = ['java', '-jar', apktool_name, 'b', '-f', '--use-aapt2', apktool_d_folder, '-o', get_modified_filename(apk_path)]
+	else:
+		command = ['java', '-jar', apktool_name, 'b', '-f', apktool_d_folder, '-o', get_modified_filename(apk_path)]
+
+	output = run_command(command, True, "Compile....")
+	return output
 
 
+def signAPK(apk_path):
+	print('Start compile')
+	command = ['java', '-jar', uber_name, '--apks', get_modified_filename(apk_path)]
+	output = run_command(command, True, "Signing App.....")
+	return output
+
+
+def installAPK(apk_path):
+	print('Start install signed app')
+	command = ['adb', 'install', '-t',  get_modified_filename(apk_path, '_patched-aligned-debugSigned')]
+	output = run_command(command, True, "Intall App.....")
+	return output
+
+
+#========
+def decompile_apk(apk_path, use_aapt2):
+	remove_output_folder(dir_app)
+	decompileAPK(apk_path, use_aapt2)
+
+
+def compile_source(apk_path, use_aapt2):
+	output = compileAPK(apk_path, use_aapt2)
+	
+	if output is not None:
+		output = signAPK(apk_path)
+
+	if output is not None:
+		installAPK(apk_path)
+
+
+
+#=====================================================================================
+def connect_to_frida():
+    #"Connect to the Frida server, attach to the 'Gadget' process, and retrieve /data path content.
+	try:
+		device = frida.get_usb_device()
+		session = device.attach("Gadget")
+        
+		script = session.create_script("""
+            'use strict';
+
+            const File = ObjC.classes.NSFileManager.defaultManager();
+            const dataPath = "/data";
+            
+            const content = File.contentsOfDirectoryAtPath_error_(dataPath, NULL);
+            const files = [];
+            
+            const count = content.count();
+            for (let i = 0; i < count; i++) {
+                files.push(content.objectAtIndex_(i).toString());
+            }
+            
+            send(files);
+        """)
+        
+		def on_message(message, data):
+			if 'payload' in message:
+				for file in message['payload']:
+					print(file)
+        
+		script.on('message', on_message)
+		script.load()
+        
+	except frida.ProcessNotFoundError:
+		print("Gadget process not found.")
+	except Exception as e:
+		print(f"Failed: {e}")
 
 
 
@@ -744,7 +874,7 @@ dir_user_cert = "/data/misc/user/0/cacerts-added/"
 
 #LazyFrida
 version = "Version 1.7"
-date_releae = "12/08/2023"
+date_releae = "14/08/2023"
 
 
 title = r'''
@@ -795,6 +925,14 @@ def main():
 	#Frida connection
 	parser.add_argument('-f', '--frida', nargs='+', help='start, stop, check version of frida server \npotential parameters: start, stop, version')
 
+	#Decompile
+	parser.add_argument('-d', '--decompile', metavar='apk', type=str, help='APK file to decompile')
+
+	# Argument for compiling
+	parser.add_argument('-c', '--compile', metavar='output', type=str, help='Filename to compile into APK such as exam.apk')
+	
+ 	# Optional argument to use aapt2
+	parser.add_argument('--use-aapt2', action='store_true', help='Using AAPT2 for Decompile and compile to offer better performance and additional features.')
 
 
 	args = parser.parse_args()
@@ -815,6 +953,8 @@ def main():
 				list_running_processes_with_frida()
 			elif arg == 'runn':
 				list_running_applications_with_frida()
+			elif arg == 'conn':
+				connect_to_frida()
 
 
     # Check the first argument after --usb-proxy
@@ -833,6 +973,12 @@ def main():
 			stop_frida_server()
 		elif args.frida[0] == 'version':
 			check_frida_version()
+
+	if args.decompile:
+		decompile_apk(args.decompile, args.use_aapt2)
+
+	if args.compile:
+		compile_source(args.compile,  args.use_aapt2)
 
 
 
