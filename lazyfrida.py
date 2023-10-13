@@ -8,7 +8,7 @@ import os
 import shutil
 import re
 import xml.etree.ElementTree as ET
-import frida
+#import frida
 
 
 
@@ -231,15 +231,40 @@ def adb_reverse(port, cmd):
     command = ['adb', 'reverse', f'tcp:{port}', f'tcp:{port}']
     run_command(command, False, "ADB reverse: " + cmd)
 
-def start_proxy():
+
+# Test cases
+# iptableToInvisibleProxy('-A')  # For appending
+# iptableToInvisibleProxy('-D')  # For deleting
+def iptableToInvisibleProxy(action='-D'):
+	if action not in ['-D', '-A']:
+		print("Invalid action. Use -D for delete or -A for append.")
+		return
+	process = subprocess.Popen(["adb", "shell"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	commands = f"""
+	su
+	iptables -t nat {action} OUTPUT -p tcp --dport 80 -j DNAT --to-destination 127.0.0.1:8080
+	iptables -t nat {action} OUTPUT -p tcp --dport 443 -j DNAT --to-destination 127.0.0.1:8080
+	iptables -t nat -L
+	""".encode()
+	stdout, stderr = process.communicate(input=commands)
+	print(stdout.decode())
+
+
+
+def start_proxy(action=None):
 	if check_adb() is not None:
 		adb_shell_settings_put_global_http_proxy(':0', "Clear USB Proxy")
 		adb_shell_settings_put_global_http_proxy('127.0.0.1:8080', "Set USB proxy")
 		adb_reverse('8080', "Set Port")
+		if action == "flutter":
+			iptableToInvisibleProxy('-D')
+			iptableToInvisibleProxy('-A')
 
-def stop_proxy():
+def stop_proxy(action=None):
 	if check_adb() is not None:
 		adb_shell_settings_put_global_http_proxy(':0', "Clear USB Proxy")
+		if action == "flutter":
+			iptableToInvisibleProxy('-D')
 
 
 #=====================================================================================
@@ -873,8 +898,8 @@ dir_sytem_cert = "/system/etc/security/cacerts/"
 dir_user_cert = "/data/misc/user/0/cacerts-added/"
 
 #LazyFrida
-version = "Version 1.7"
-date_releae = "14/08/2023"
+version = "Version 1.8"
+date_releae = "13/10/2023"
 
 
 title = r'''
@@ -920,7 +945,7 @@ def main():
 	parser.add_argument('-q', '--query', nargs='*', help='connects to frida server and accepts multiple parameters. \npotential parameters: apps, proc, runn')
 
 	#Proxy connection
-	parser.add_argument('-u', '--usb-proxy', nargs='+', help='start and stop the usb proxy \npotential parameters: start, stop')
+	parser.add_argument('-u', '--usb-proxy', nargs='+', help='start and stop the usb proxy and configure iptables for invisible proxying (Flutter)  \npotential parameters: start, stop, and flutter')
 
 	#Frida connection
 	parser.add_argument('-f', '--frida', nargs='+', help='start, stop, check version of frida server \npotential parameters: start, stop, version')
@@ -960,9 +985,19 @@ def main():
     # Check the first argument after --usb-proxy
 	if args.usb_proxy:
 		if args.usb_proxy[0] == 'start':
-			start_proxy()
+			if 'flutter' in args.usb_proxy:
+				print("Flutter parameter detected!")
+				start_proxy('flutter')
+			else:
+				print(args.usb_proxy)
+				start_proxy()
 		elif args.usb_proxy[0] == 'stop':
-			stop_proxy()
+			if 'flutter' in args.usb_proxy:
+				print("Flutter parameter detected!")
+				stop_proxy('flutter')
+			else:
+				print(args.usb_proxy)
+				stop_proxy()
 
 
    # Check the first argument after --frida

@@ -21,6 +21,9 @@ python3 lazyfrida.py install-frida
 See other usage examples.
 
 ```
+usage: python3 lazyfrida.py [-h] [-q [QUERY ...]] [-u USB_PROXY [USB_PROXY ...]] [-f FRIDA [FRIDA ...]] [-d apk] [-c output] [--use-aapt2]
+                            {install-frida,install-cert,patch-apk} ...
+
 positional arguments:
   {install-frida,install-cert,patch-apk}
                         installation commands
@@ -35,11 +38,16 @@ options:
                         connects to frida server and accepts multiple parameters.
                         potential parameters: apps, proc, runn
   -u USB_PROXY [USB_PROXY ...], --usb-proxy USB_PROXY [USB_PROXY ...]
-                        start and stop the usb proxy
-                        potential parameters: start, stop
+                        start and stop the usb proxy and configure iptables for invisible proxying (Flutter)
+                        potential parameters: start, stop, and flutter
   -f FRIDA [FRIDA ...], --frida FRIDA [FRIDA ...]
                         start, stop, check version of frida server
                         potential parameters: start, stop, version
+  -d apk, --decompile apk
+                        APK file to decompile
+  -c output, --compile output
+                        Filename to compile into APK such as exam.apk
+  --use-aapt2           Using AAPT2 for Decompile and compile to offer better performance and additional features.
 ```
 
 - News Feeds https://www.facebook.com/itselectlab/
