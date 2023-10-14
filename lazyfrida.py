@@ -945,7 +945,7 @@ def main():
 	parser.add_argument('-q', '--query', nargs='*', help='connects to frida server and accepts multiple parameters. \npotential parameters: apps, proc, runn')
 
 	#Proxy connection
-	parser.add_argument('-u', '--usb-proxy', nargs='+', help='start and stop the usb proxy and configure iptables for invisible proxying (Flutter)  \npotential parameters: start, stop, and flutter')
+	parser.add_argument('-u', '--usb-proxy', nargs='+', help='start and stop the usb proxy including iptables for invisible proxying (Flutter)  \npotential parameters: start, stop, and flutter')
 
 	#Frida connection
 	parser.add_argument('-f', '--frida', nargs='+', help='start, stop, check version of frida server \npotential parameters: start, stop, version')
