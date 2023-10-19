@@ -898,8 +898,8 @@ dir_sytem_cert = "/system/etc/security/cacerts/"
 dir_user_cert = "/data/misc/user/0/cacerts-added/"
 
 #LazyFrida
-version = "Version 1.8"
-date_releae = "13/10/2023"
+version = "Version 1.9"
+date_releae = "19/10/2023"
 
 
 title = r'''
