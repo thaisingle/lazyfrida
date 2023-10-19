@@ -41,7 +41,7 @@ def install_or_upgrade_frida_tools():
 def is_emulator():
 	# Check if it's an emulator or a real device
 	command = ['adb', 'shell', 'getprop', 'ro.build.characteristics']
-	output = run_command(command, False, "Device type check")
+	output = run_command(command, False, "Checking the Device type.")
 
 	# Check if the output contains the word "emulator"
 	return 'emulator' in output.lower()
@@ -149,21 +149,18 @@ def copy_to_device():
 #Frida connection
 def list_running_processes_with_frida():
 	if check_adb() is not None:
-		print('Command: frida-ps -U\n')
 		command = ['frida-ps', '-U']
-		run_command(command)
+		run_command(command, True, 'List Running Process - frida-ps -U\n')
 
 def list_running_applications_with_frida():
 	if check_adb() is not None:
-		print('Command: frida-ps -Ua\n')
 		command = ['frida-ps', '-Ua']
-		run_command(command, True, "List Running Application")
+		run_command(command, True, "cfrida-ps -Ua\n")
 
 def list_installed_applications_with_frida():
 	if check_adb() is not None:
-		print('Command: frida-ps -Uai\n')
 		command = ['frida-ps', '-Uai']
-		run_command(command, True, "List Installed Application")
+		run_command(command, True, "List Installed Application - frida-ps -Uai\n")
 
 
 #=====================================================================================
@@ -205,23 +202,23 @@ def start_frida_server():
 			# It's a real device
 			start_command = ['adb', 'shell', 'su', '-c', '/data/local/tmp/frida-server &']
 	    
-		run_command(start_command, True, "Start Frida server")
+		run_command(start_command, True, "Starting the Frida server")
 
 
 
 #=====================================================================================
 #Usb Proxy
 def check_adb():
-	print('Command: adb shell\n')
 	command = ['adb', 'shell', 'echo', 'Connected']
-	result = subprocess.run(command, capture_output=True, text=True)
+	#result = subprocess.run(command, capture_output=True, text=True)
+	output = run_command(command, False, "Checking ADB connection.")
 
-	if "Connected" in result.stdout:
-		print('ADB shell connected successfully.', result.stdout)
-		return result.stdout
-	else:
+	if not output:
 		print('Please check USB/ADB connection or restart Android devices.')
 		return None
+	else:
+		return output
+
 
 def adb_shell_settings_put_global_http_proxy(proxy, cmd):
     command = ['adb', 'shell', 'settings', 'put', 'global', 'http_proxy', proxy]
@@ -274,12 +271,15 @@ def run_command(command, shell=False, objective=""):
 		result = subprocess.run(command, capture_output=True, shell=shell)
 		if result.returncode == 0:
 			output = result.stdout.decode().strip()
-			print("Output:", objective, "\n", output)
+			if not output:
+				print(f'[+] Output: {objective}')
+			else:
+				print(f'[+] Output: {objective} \n{output}')
 			print("Command executed successfully.\n")
 			return output
 		else:
 			error = result.stderr.strip() if result.stderr else result.stdout.strip()
-			print("Error:", objective, "\n", error)
+			print(f'[-] Error: {objective} \n{error}')
 			print("Command failed.\n")
 			return None
 	except subprocess.CalledProcessError as e:
@@ -898,8 +898,8 @@ dir_sytem_cert = "/system/etc/security/cacerts/"
 dir_user_cert = "/data/misc/user/0/cacerts-added/"
 
 #LazyFrida
-version = "Version 1.9"
-date_releae = "19/10/2023"
+version = "Version 1.10"
+date_releae = "20/10/2023"
 
 
 title = r'''
