@@ -773,7 +773,7 @@ def get_modified_filename(apk_path, suffix='_patched'):
 
 #========
 def compileAPK(apk_path, use_aapt2):
-	print('Start compile')
+	print(f'Start compile {apk_path}')
 
 	if use_aapt2:
 		command = ['java', '-jar', apktool_name, 'b', '-f', '--use-aapt2', apktool_d_folder, '-o', get_modified_filename(apk_path)]
@@ -785,7 +785,7 @@ def compileAPK(apk_path, use_aapt2):
 
 
 def signAPK(apk_path):
-	print('Start compile')
+	print(f'Start compile {apk_path}')
 	command = ['java', '-jar', uber_name, '--apks', get_modified_filename(apk_path)]
 	output = run_command(command, True, "Signing App.....")
 	return output
@@ -800,6 +800,7 @@ def installAPK(apk_path):
 
 #========
 def decompile_apk(apk_path, use_aapt2):
+	download_component()
 	remove_output_folder(dir_app)
 	decompileAPK(apk_path, use_aapt2)
 
@@ -898,8 +899,8 @@ dir_sytem_cert = "/system/etc/security/cacerts/"
 dir_user_cert = "/data/misc/user/0/cacerts-added/"
 
 #LazyFrida
-version = "Version 1.10"
-date_releae = "20/10/2023"
+version = "Version 1.11"
+date_releae = "23/10/2023"
 
 
 title = r'''
