@@ -221,11 +221,11 @@ def check_adb():
 
 
 def adb_shell_settings_put_global_http_proxy(proxy, cmd):
-    command = ['adb', 'shell', 'settings', 'put', 'global', 'http_proxy', proxy]
+    command = ['adb', 'shell', 'su', '-c', 'settings', 'put', 'global', 'http_proxy', proxy]
     run_command(command, False, "ADB shell settings put global http_proxy: " + cmd)
 
 def adb_reverse(port, cmd):
-    command = ['adb', 'reverse', f'tcp:{port}', f'tcp:{port}']
+    command = ['adb', 'shell', 'su', '-c','reverse', f'tcp:{port}', f'tcp:{port}']
     run_command(command, False, "ADB reverse: " + cmd)
 
 
@@ -252,7 +252,7 @@ def start_proxy(action=None):
 	if check_adb() is not None:
 		adb_shell_settings_put_global_http_proxy(':0', "Clear USB Proxy")
 		adb_shell_settings_put_global_http_proxy('127.0.0.1:8080', "Set USB proxy")
-		adb_reverse('8080', "Set Port")
+		#adb_reverse('8080', "Set Port") ไม่จำเป็นต้องใช้
 		if action == "flutter":
 			iptableToInvisibleProxy('-D')
 			iptableToInvisibleProxy('-A')
@@ -899,8 +899,8 @@ dir_sytem_cert = "/system/etc/security/cacerts/"
 dir_user_cert = "/data/misc/user/0/cacerts-added/"
 
 #LazyFrida
-version = "Version 1.11"
-date_releae = "23/10/2023"
+version = "Version 1.12"
+date_releae = "27/11/2023"
 
 
 title = r'''
