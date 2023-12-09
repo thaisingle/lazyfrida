@@ -225,8 +225,10 @@ def adb_shell_settings_put_global_http_proxy(proxy, cmd):
     run_command(command, False, "ADB shell settings put global http_proxy: " + cmd)
 
 def adb_reverse(port, cmd):
-    command = ['adb', 'shell', 'su', '-c','reverse', f'tcp:{port}', f'tcp:{port}']
+    command = ['adb', 'reverse', f'tcp:{port}', f'tcp:{port}']
     run_command(command, False, "ADB reverse: " + cmd)
+	#forward_command = ['adb', 'forward', f'tcp:{port}', f'tcp:{port}']
+	#run_command(forward_command, False, "ADB forward: " + cmd)
 
 
 # Test cases
@@ -252,7 +254,7 @@ def start_proxy(action=None):
 	if check_adb() is not None:
 		adb_shell_settings_put_global_http_proxy(':0', "Clear USB Proxy")
 		adb_shell_settings_put_global_http_proxy('127.0.0.1:8080', "Set USB proxy")
-		#adb_reverse('8080', "Set Port") ไม่จำเป็นต้องใช้
+		adb_reverse('8080', "Set Port") 
 		if action == "flutter":
 			iptableToInvisibleProxy('-D')
 			iptableToInvisibleProxy('-A')
@@ -776,9 +778,9 @@ def compileAPK(apk_path, use_aapt2):
 	print(f'Start compile {apk_path}')
 
 	if use_aapt2:
-		command = ['java', '-jar', apktool_name, 'b', '-f', '--use-aapt2', apktool_d_folder, '-o', get_modified_filename(apk_path)]
+		command = ['java', '-jar', apktool_name, 'b', '-f', '--use-aapt2', apktool_d_folder, '-o', f'{apk_path}_patched.apk']
 	else:
-		command = ['java', '-jar', apktool_name, 'b', '-f', apktool_d_folder, '-o', get_modified_filename(apk_path)]
+		command = ['java', '-jar', apktool_name, 'b', '-f', apktool_d_folder, '-o', f'{apk_path}_patched.apk']
 
 	output = run_command(command, True, "Compile....")
 	return output
@@ -786,14 +788,14 @@ def compileAPK(apk_path, use_aapt2):
 
 def signAPK(apk_path):
 	print(f'Start compile {apk_path}')
-	command = ['java', '-jar', uber_name, '--apks', get_modified_filename(apk_path)]
+	command = ['java', '-jar', uber_name, '--apks', f'{apk_path}_patched.apk']
 	output = run_command(command, True, "Signing App.....")
 	return output
 
 
 def installAPK(apk_path):
 	print('Start install signed app')
-	command = ['adb', 'install', '-t',  get_modified_filename(apk_path, '_patched-aligned-debugSigned')]
+	command = ['adb', 'install', '-t', 'output_patched-aligned-debugSigned.apk']
 	output = run_command(command, True, "Intall App.....")
 	return output
 
@@ -899,13 +901,8 @@ dir_sytem_cert = "/system/etc/security/cacerts/"
 dir_user_cert = "/data/misc/user/0/cacerts-added/"
 
 #LazyFrida
-<<<<<<< HEAD
-version = "Version 1.11"
-date_releae = "23/10/2023"
-=======
-version = "Version 1.12"
-date_releae = "27/11/2023"
->>>>>>> 30e97a4576f00525bbb68e91c787da6cb91945af
+version = "Version 1.14"
+date_releae = "28/11/2023"
 
 
 title = r'''
