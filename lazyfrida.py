@@ -155,7 +155,7 @@ def list_running_processes_with_frida():
 def list_running_applications_with_frida():
 	if check_adb() is not None:
 		command = ['frida-ps', '-Ua']
-		run_command(command, True, "cfrida-ps -Ua\n")
+		run_command(command, True, "frida-ps -Ua\n")
 
 def list_installed_applications_with_frida():
 	if check_adb() is not None:
@@ -221,12 +221,14 @@ def check_adb():
 
 
 def adb_shell_settings_put_global_http_proxy(proxy, cmd):
-    command = ['adb', 'shell', 'settings', 'put', 'global', 'http_proxy', proxy]
+    command = ['adb', 'shell', 'su', '-c', 'settings', 'put', 'global', 'http_proxy', proxy]
     run_command(command, False, "ADB shell settings put global http_proxy: " + cmd)
 
 def adb_reverse(port, cmd):
     command = ['adb', 'reverse', f'tcp:{port}', f'tcp:{port}']
     run_command(command, False, "ADB reverse: " + cmd)
+	#forward_command = ['adb', 'forward', f'tcp:{port}', f'tcp:{port}']
+	#run_command(forward_command, False, "ADB forward: " + cmd)
 
 
 # Test cases
@@ -252,7 +254,7 @@ def start_proxy(action=None):
 	if check_adb() is not None:
 		adb_shell_settings_put_global_http_proxy(':0', "Clear USB Proxy")
 		adb_shell_settings_put_global_http_proxy('127.0.0.1:8080', "Set USB proxy")
-		adb_reverse('8080', "Set Port")
+		adb_reverse('8080', "Set Port") 
 		if action == "flutter":
 			iptableToInvisibleProxy('-D')
 			iptableToInvisibleProxy('-A')
@@ -303,29 +305,51 @@ def install_frida():
 	if output is not None:
 		check_frida_version()
 		output = check_adb()
-	
-	if output is not None:
-		output = check_root()
+
 
 	if output is not None:
-		selected_cpu = check_android_cpu()
-		matching_download = match_cpu_architecture_with_download(cpu_architecture, cpu_download, selected_cpu)
+		check_frida_version()
+		output = check_adb()
 
-	if matching_download is not None:
-		download_url = download_frida_server_url(matching_download)
+		if output is not None:
+			output = check_root()
 
-	if download_url is not None:
-		output = download_frida(download_url, frida_zip)
+			if output is not None:
+				selected_cpu = check_android_cpu()
+				matching_download = match_cpu_architecture_with_download(cpu_architecture, cpu_download, selected_cpu)
+				
+				if matching_download is not None:
+					download_url = download_frida_server_url(matching_download)
+
+					if download_url is not None:
+						output = download_frida(download_url, frida_zip)
+
+						if output == True:
+							output = extract_xz(frida_zip, frida_name)
+
+							if output == True:
+								output = copy_to_device()
+
+								if output is not None:
+									start_frida_server()
+									print("\nAll Insalled Frida and Frida-Server Successfully.")
+	else:
+		return  # Exit the function if output is None at any point
+
+
+
+
+
+
+
+
+
 	
-	if output == True:
-		output = extract_xz(frida_zip, frida_name)
+
 	
-	if output == True:
-		output = copy_to_device()
+
 	
-	if output is not None:
-		start_frida_server()
-		print("\nAll Insalled Frida and Frida-Server Successfully.")
+
 
 
 
@@ -773,33 +797,34 @@ def get_modified_filename(apk_path, suffix='_patched'):
 
 #========
 def compileAPK(apk_path, use_aapt2):
-	print('Start compile')
+	print(f'Start compile {apk_path}')
 
 	if use_aapt2:
-		command = ['java', '-jar', apktool_name, 'b', '-f', '--use-aapt2', apktool_d_folder, '-o', get_modified_filename(apk_path)]
+		command = ['java', '-jar', apktool_name, 'b', '-f', '--use-aapt2', apktool_d_folder, '-o', f'{apk_path}_patched.apk']
 	else:
-		command = ['java', '-jar', apktool_name, 'b', '-f', apktool_d_folder, '-o', get_modified_filename(apk_path)]
+		command = ['java', '-jar', apktool_name, 'b', '-f', apktool_d_folder, '-o', f'{apk_path}_patched.apk']
 
 	output = run_command(command, True, "Compile....")
 	return output
 
 
 def signAPK(apk_path):
-	print('Start compile')
-	command = ['java', '-jar', uber_name, '--apks', get_modified_filename(apk_path)]
+	print(f'Start compile {apk_path}')
+	command = ['java', '-jar', uber_name, '--apks', f'{apk_path}_patched.apk']
 	output = run_command(command, True, "Signing App.....")
 	return output
 
 
 def installAPK(apk_path):
 	print('Start install signed app')
-	command = ['adb', 'install', '-t',  get_modified_filename(apk_path, '_patched-aligned-debugSigned')]
+	command = ['adb', 'install', '-t', 'output_patched-aligned-debugSigned.apk']
 	output = run_command(command, True, "Intall App.....")
 	return output
 
 
 #========
 def decompile_apk(apk_path, use_aapt2):
+	download_component()
 	remove_output_folder(dir_app)
 	decompileAPK(apk_path, use_aapt2)
 
@@ -898,8 +923,8 @@ dir_sytem_cert = "/system/etc/security/cacerts/"
 dir_user_cert = "/data/misc/user/0/cacerts-added/"
 
 #LazyFrida
-version = "Version 1.10"
-date_releae = "20/10/2023"
+version = "Version 1.15"
+date_releae = "11/01/2024"
 
 
 title = r'''
