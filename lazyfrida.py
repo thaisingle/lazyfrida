@@ -8,7 +8,7 @@ import os
 import shutil
 import re
 import xml.etree.ElementTree as ET
-#import frida
+import frida
 
 
 
@@ -221,8 +221,12 @@ def check_adb():
 
 
 def adb_shell_settings_put_global_http_proxy(proxy, cmd):
-    command = ['adb', 'shell', 'su', '-c', 'settings', 'put', 'global', 'http_proxy', proxy]
-    run_command(command, False, "ADB shell settings put global http_proxy: " + cmd)
+	if is_emulator():
+		# It's an emulator
+		command = ['adb', 'shell', 'su', '0', 'settings', 'put', 'global', 'http_proxy', proxy]
+	else:
+		command = ['adb', 'shell', 'su', '-c', 'settings', 'put', 'global', 'http_proxy', proxy]
+	run_command(command, False, "ADB shell settings put global http_proxy: " + cmd)
 
 def adb_reverse(port, cmd):
     command = ['adb', 'reverse', f'tcp:{port}', f'tcp:{port}']
@@ -339,16 +343,6 @@ def install_frida():
 
 
 
-	
-
-	
-
-	
-
-
-
-
-
 #=====================================================================================
 #Installin CA certification of Burp as system level.
 def download_cert(ip_address):
@@ -358,7 +352,49 @@ def download_cert(ip_address):
     if output is None: print("Please check if your Burp Suite is properly configured and running")
     return output
 
+
 def install_cert():
+	command = 'openssl x509 -inform DER -in cacert.der -out cacert.pem'
+	output = run_command(command, True, "Converting DER to PEM format")
+
+	if output is not None:
+		command = "openssl x509 -inform PEM -subject_hash_old -in cacert.pem | head -1"
+		cert_hash = run_command(command, True, "Extracting the subject hash")
+
+	if cert_hash is not None:
+		rename_command = f'cp cacert.pem {cert_hash}.0'
+		output = run_command(rename_command, True, "Renaming the PEM file")
+
+	if output is not None:
+		# Ensure correct syntax for mount command
+		mount_command = 'adb shell su -c "mount -o rw,remount /"'
+		output = run_command(mount_command, True, "Mounting / as Read-Write")
+
+		if output is None:
+			print("[-] Error: Failed to remount / as Read-Write. Please Reboot/Start Device")
+			command = 'adb reboot'
+			output = run_command(command, True, "Reboot Device")
+			return None
+
+		push_command = f'adb push {cert_hash}.0 /sdcard/Download/'
+		output = run_command(push_command, True, "Pushing the certificate to the device")
+
+	if output is not None:
+		copy_command = f'adb shell su -c "cp /sdcard/Download/{cert_hash}.0 /system/etc/security/cacerts/{cert_hash}.0"'
+		output = run_command(copy_command, True, "Copying the certificate to the system cacerts directory")
+
+		if output is None:
+			print("[-] Error: Failed to copy certificate to the system cacerts directory")
+			return None
+
+	if output is not None:
+		chmod_command = f'adb shell su -c "chmod 644 /system/etc/security/cacerts/{cert_hash}.0"'
+		output = run_command(chmod_command, True, "Setting permissions for the certificate")
+    
+	return output
+
+
+def install_cert2():
 	command = 'openssl x509 -inform DER -in cacert.der -out cacert.pem'
 	output = run_command(command, True, "Converting DER to PEM format")
 
@@ -918,8 +954,8 @@ dir_sytem_cert = "/system/etc/security/cacerts/"
 dir_user_cert = "/data/misc/user/0/cacerts-added/"
 
 #LazyFrida
-version = "Version 1.15"
-date_releae = "11/01/2024"
+version = "Version 1.17"
+date_releae = "15/01/2024"
 
 
 title = r'''
