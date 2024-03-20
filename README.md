@@ -2,7 +2,8 @@
 
 ## Preparation
 
-- Android device that has been successfully rooted.
+- Android device/Emulator that has been successfully rooted.
+- Based on Windows
 - USB debugging is enabled (accessing the Developer options menu may vary for each device).
 - USB cable.
 - Installed Python3.
@@ -21,16 +22,18 @@ python3 lazyfrida.py install-frida
 See other usage examples.
 
 ```
-usage: python3 lazyfrida.py [-h] [-q [QUERY ...]] [-u USB_PROXY [USB_PROXY ...]] [-f FRIDA [FRIDA ...]] [-d apk] [-c output] [--use-aapt2]
-                            {install-frida,install-cert,patch-apk} ...
+usage: python3 lazyfrida.py [-h] [-q [QUERY ...]] [-u USB_PROXY [USB_PROXY ...]]
+                            [-f FRIDA [FRIDA ...]] [-d apk] [-c output] [--use-aapt2]
+                            {install-frida,install-cert,patch-apk,emulator} ...
 
 positional arguments:
-  {install-frida,install-cert,patch-apk}
+  {install-frida,install-cert,patch-apk,emulator}
                         installation commands
     install-frida       installs frida and frida-server on Android
     install-cert        installs CA Burp suite certificate
                         defines [ip] of Burp Suite: default: 127.0.0.1
     patch-apk           installs frida gadget to apk
+    emulator            Opens an emulator in writeable mode (Windows)
 
 options:
   -h, --help            show this help message and exit
@@ -38,7 +41,7 @@ options:
                         connects to frida server and accepts multiple parameters.
                         potential parameters: apps, proc, runn
   -u USB_PROXY [USB_PROXY ...], --usb-proxy USB_PROXY [USB_PROXY ...]
-                        start and stop the usb proxy and configure iptables for invisible proxying (Flutter)
+                        start and stop the usb proxy including iptables for invisible proxying (Flutter)
                         potential parameters: start, stop, and flutter
   -f FRIDA [FRIDA ...], --frida FRIDA [FRIDA ...]
                         start, stop, check version of frida server
