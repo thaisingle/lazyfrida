@@ -9,6 +9,8 @@ import shutil
 import re
 import xml.etree.ElementTree as ET
 import frida
+import getpass  # Add this line to import the getpass module
+import time
 
 
 
@@ -47,16 +49,17 @@ def is_emulator():
 	return 'emulator' in output.lower()
 
 
+
 def check_root():
 	# Check if it's an emulator or a real device
 	if is_emulator():
 		# It's an emulator
 		command = ['adb', 'shell', 'su', '0', 'id']
+		output = run_command(command, False, "Root status check")
 	else:
 		# It's a real device
 		command = ['adb', 'shell', 'su', '-c', 'id']
-
-	output = run_command(command, False, "Root status check")
+		output = run_command(command, False, "Root status check")
 	return output
 
 
@@ -296,6 +299,31 @@ def run_command(command, shell=False, objective=""):
 		return None
 
 
+#Execute command
+def run_command2(command, objective=""):
+	try:
+		result = subprocess.run(command, capture_output=True, text=True)
+		if result.returncode == 0:
+			output = result
+			if not output:
+				print(f'[+] Output: {objective}')
+			else:
+				print(f'[+] Output: {objective} \n{output}')
+			print("Command executed successfully.\n")
+			return output
+		else:
+			error = result.stderr.strip() if result.stderr else result.stdout.strip()
+			print(f'[-] Error: {objective} \n{error}')
+			print("Command failed.\n")
+			return None
+	except subprocess.CalledProcessError as e:
+		print("An error occurred while executing the command: {}\n".format(str(e)))
+		return None
+	except KeyboardInterrupt:
+		print("\nKeyboard interrupt detected. Exiting...\n")
+		return None
+
+
 #=====================================================================================
 def install_frida():
 	print("\nInsalling Frida and Frida-Server")
@@ -330,6 +358,7 @@ def install_frida():
 								output = copy_to_device()
 
 								if output is not None:
+									countdown_min(10)
 									start_frida_server()
 									print("\nAll Insalled Frida and Frida-Server Successfully.")
 	else:
@@ -353,6 +382,170 @@ def download_cert(ip_address):
     return output
 
 
+
+#===============
+#Emulator
+def check_android_sdk_emulator_path():
+	# (1) Find the current username
+	current_username = getpass.getuser()
+    
+	# (2) Create the path using the current username
+	path = f"C:\\Users\\{current_username}\\AppData\\Local\\Android\\Sdk\\emulator"
+    
+	# (3) Check if the path exists
+	path_exists = os.path.exists(path)
+    
+	return path, path_exists
+
+
+def list_avds(emulator_path):
+	# Ensure the path ends with emulator.exe
+	if not emulator_path.endswith("emulator.exe"):
+		emulator_path = emulator_path.rstrip("\\") + "\\emulator.exe"
+
+	# Construct the command to execute
+	command = [emulator_path, "-list-avds"]
+
+	try:
+		# Execute the command and capture its output
+		result = subprocess.run(command, capture_output=True, text=True, check=True)
+		# If successful, return the list of AVDs
+		avds = result.stdout.strip().split('\n')  # Split the output into lines to get a list of AVDs
+		return avds
+	except subprocess.CalledProcessError as e:
+		# In case of an error, return an empty list or a list containing the error message
+		return [f"Error executing command: {e}"]
+
+
+
+def select_list_avds():
+	# Assume check_android_sdk_emulator_path() is implemented elsewhere
+	emulator_path, path_exists = check_android_sdk_emulator_path()
+	if path_exists:
+		avds = list_avds(emulator_path)
+		if avds and not avds[0].startswith("Error"):
+			# Print the list of AVDs with indices for the user to choose
+			for index, avd in enumerate(avds):
+				print(f"{index}: {avd}")
+
+			# Ask the user to select an AVD by its index
+			while True:  # Keep asking until a valid input is given
+				try:
+					user_choice = int(input("Enter the number of the AVD to select: "))
+					if 0 <= user_choice < len(avds):  # Check if the choice is within the valid range
+						selected_avd = avds[user_choice]
+						print(f"You have selected: {selected_avd}")
+						return selected_avd  # Return the selected AVD name
+					else:
+						print("Invalid selection. Please enter a number from the list.")
+				except ValueError:
+					print("Please enter a numeric value.")
+		else:
+			print(avds[0])  # This will print the error message
+			return None  # Return None if there's an error
+	else:
+		print("Android SDK Emulator path does not exist")
+		return None  # Return None if the emulator path doesn't exist
+
+
+
+def run_selected_avd_emulator(selected_avd):
+	emulator_path, path_exists = check_android_sdk_emulator_path()
+	if not path_exists:
+		print("Emulator path does not exist")
+		return
+    
+	# Construct the command to execute
+	emulator_exe_path = os.path.join(emulator_path, "emulator.exe")
+	command = [emulator_exe_path, "-avd", selected_avd, "-writable-system"]
+
+	try:
+		# Execute the command, note: this will open the emulator and may not return until the emulator is closed
+		print(f"Running emulator for AVD '{selected_avd}'...")
+		subprocess.run(command)
+		print("Emulator started successfully.")
+	except subprocess.CalledProcessError as e:
+		print(f"Error executing emulator command: {e}")
+
+
+def open_writable_emulator():
+	selected_avd = select_list_avds()
+	run_selected_avd_emulator(selected_avd)
+
+
+#==============================================================
+#Emulator Mount Drive
+def check_root_access():
+	command = ["adb", "root"]
+	result = run_command2(command, "Attempt to gain root access")
+    
+	# Check the output for success or failure indicators
+	if "cannot run as root in production builds" in result.stderr:
+		return False
+	elif "restarting adbd as root" in result.stderr or "adbd is already running as root" in result.stdout:
+		return True
+	else:
+		return False
+
+    
+
+def check_userdebug():
+	command = ["adb", "shell", "getprop", "ro.build.type"]
+	result = run_command2(command, "Check if the build type is userdebug")
+
+	# Check if 'userdebug' is in the output of the command
+	if 'userdebug' in result.stdout:
+		return True
+	else:
+		return False
+
+
+def countdown_min(total_seconds):
+	while total_seconds > 0:
+		mins, secs = divmod(total_seconds, 60)
+		time_format = '{:02d}:{:02d}'.format(mins, secs)
+		print("Please wait: ", time_format, end='\r')  # Print the time in MM:SS format
+		time.sleep(1)
+		total_seconds -= 1
+
+	print("Countdown finished!")
+
+
+
+def remount_writable_emlator():
+	if check_root_access() is True:
+		countdown_min(5)
+		if check_userdebug() is True:
+			# Disable verity to allow changes to system partition
+			command = ["adb", "disable-verity"]
+			result = run_command2(command, "Disable verity to allow changes to system partition")
+        
+			reboot_device()
+
+			command = ["adb", "wait-for-device"]
+			result = run_command2(command, "Wait for the device to reboot, then gain root access again")
+
+			countdown_min(30)
+			check_root_access()
+
+			# Attempt to remount the system partition as writable
+			command = ["adb", "remount"]
+			result = run_command2(command, "Attempt to remount the system partition as writable")
+
+			print('mount')
+			# Additional command to ensure /system can be remounted as rw
+			command = ["adb", "shell", "mount -o rw,remount /"]
+			result = run_command2(command, "Command to ensure /system can be remounted as rw")
+		else:
+				print("Failure to install Burp Suite Certificate")
+				return None
+	else:
+		return None
+
+
+
+#===========
+
 def install_cert():
 	command = 'openssl x509 -inform DER -in cacert.der -out cacert.pem'
 	output = run_command(command, True, "Converting DER to PEM format")
@@ -366,58 +559,41 @@ def install_cert():
 		output = run_command(rename_command, True, "Renaming the PEM file")
 
 	if output is not None:
-		# Ensure correct syntax for mount command
-		mount_command = 'adb shell su -c "mount -o rw,remount /"'
-		output = run_command(mount_command, True, "Mounting / as Read-Write")
+		# Check if it's an emulator or a real device
+		if is_emulator():
+			# It's an emulator
+			output = remount_writable_emlator()
+		else:
+			# It's a real device
+			command = ["adb", "shell", "su", "-c", "mount -o rw,remount /"]
+			output = run_command(command, True, "Command to ensure /system can be remounted as rw.")
 
-		if output is None:
-			print("[-] Error: Failed to remount / as Read-Write. Please Reboot/Start Device")
-			command = 'adb reboot'
-			output = run_command(command, True, "Reboot Device")
-			return None
-
+	if output is not None:
+		#If remounting succeeds, proceed with pushing the certificate
 		push_command = f'adb push {cert_hash}.0 /sdcard/Download/'
 		output = run_command(push_command, True, "Pushing the certificate to the device")
 
 	if output is not None:
-		copy_command = f'adb shell su -c "cp /sdcard/Download/{cert_hash}.0 /system/etc/security/cacerts/{cert_hash}.0"'
+		if is_emulator():
+			# It's an emulator
+			copy_command = f'adb shell su 0 "cp /sdcard/Download/{cert_hash}.0 /system/etc/security/cacerts/{cert_hash}.0"'
+		else:
+			# It's a real device
+			copy_command = f'adb shell su -c "cp /sdcard/Download/{cert_hash}.0 /system/etc/security/cacerts/{cert_hash}.0"'
 		output = run_command(copy_command, True, "Copying the certificate to the system cacerts directory")
 
-		if output is None:
-			print("[-] Error: Failed to copy certificate to the system cacerts directory")
-			return None
 
 	if output is not None:
-		chmod_command = f'adb shell su -c "chmod 644 /system/etc/security/cacerts/{cert_hash}.0"'
-		output = run_command(chmod_command, True, "Setting permissions for the certificate")
-    
+		if is_emulator():
+			# It's an emulator
+			chmod_command = f'adb shell su 0 "chmod 644 /system/etc/security/cacerts/{cert_hash}.0"'
+		else:
+			# It's a real device
+			chmod_command = f'adb shell su -c "chmod 644 /system/etc/security/cacerts/{cert_hash}.0"'
+		output = run_command(chmod_command, True, "Setting permissions for the certificate")  
 	return output
 
 
-def install_cert2():
-	command = 'openssl x509 -inform DER -in cacert.der -out cacert.pem'
-	output = run_command(command, True, "Converting DER to PEM format")
-
-	if output is not None:
-		command = "openssl x509 -inform PEM -subject_hash_old -in cacert.pem | head -1"
-		cert_hash = run_command(command, True, "Extracting the subject hash")
-
-	if cert_hash is not None:
-		rename_command = f'cp cacert.pem {cert_hash}.0'
-		output = run_command(rename_command, True, "Renaming the PEM file")
-
-	if output is not None:
-		command = f'adb shell su -c "mount -o rw,remount /" && adb push {cert_hash}.0 /sdcard/Download/'
-		output = run_command(command, True, "Pushing the certificate to the device")
-
-	if output is not None:
-		command = f'adb shell su -c "cp /sdcard/Download/{cert_hash}.0 /system/etc/security/cacerts/{cert_hash}.0"'
-		output = run_command(command, True, "Copying the certificate to the system cacerts directory")
-
-	if output is not None:
-		command = f'adb shell su -c "chmod 644 /system/etc/security/cacerts/{cert_hash}.0"'
-		output = run_command(command, True, "Setting permissions for the certificate")
-	return output
 
 
 def reboot_device():
@@ -954,8 +1130,8 @@ dir_sytem_cert = "/system/etc/security/cacerts/"
 dir_user_cert = "/data/misc/user/0/cacerts-added/"
 
 #LazyFrida
-version = "Version 1.17"
-date_releae = "15/01/2024"
+version = "Version 1.20"
+date_releae = "20/03/2024"
 
 
 title = r'''
@@ -991,9 +1167,13 @@ def main():
 	cert_parser = subparsers.add_parser('install-cert', help='installs CA Burp suite certificate \ndefines [ip] of Burp Suite: default: 127.0.0.1')
 	cert_parser.add_argument('ip_address', nargs='?', default='127.0.0.1', help='IP address to install cert on (default: 127.0.0.1)')
 
-
+	# Patch APK subcommand
 	patch_apk_parser = subparsers.add_parser('patch-apk', help='installs frida gadget to apk')
 	patch_apk_parser.add_argument('apk_path', type=str, help='The full path to the APK file including the filename')
+
+
+	# Open Writeable Emulator subcommand
+	emulator_parser = subparsers.add_parser('emulator', help='Opens an emulator in writeable mode (Windows)')
 
 
 	#=====================================================================================
@@ -1024,6 +1204,9 @@ def main():
 		install_certificate(args.ip_address)
 	elif args.command == 'patch-apk':
 		patch_apk_frida(args.apk_path)
+	elif args.command == 'emulator':
+		# Call your function to open the emulator in writeable mode here
+		open_writable_emulator()
 
 
 	if args.query:
