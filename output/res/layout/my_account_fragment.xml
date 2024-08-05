@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView android:textColor="@color/font_grey" android:id="@id/headerTitle" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="16.0dip" android:text="@string/bottom_nav_my_account" android:layout_marginStart="16.0dip" app:layout_constraintTop_toTopOf="parent" style="@style/text_heading" />
+    <com.google.android.material.tabs.TabLayout android:id="@id/tabBar" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="16.0dip" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/header_title" app:layout_constraintTop_toTopOf="parent" app:tabIndicatorColor="@color/medium_pink" app:tabSelectedTextColor="@color/medium_pink" app:tabTextAppearance="@style/text_title_tab_bar" app:tabTextColor="@color/font_grey" />
+    <View android:background="@color/line_grey" android:layout_width="fill_parent" android:layout_height="1.0dip" app:layout_constraintTop_toBottomOf="@id/tabBar" />
+    <androidx.viewpager2.widget.ViewPager2 android:id="@id/myAccountViewPager" android:layout_width="fill_parent" android:layout_height="fill_parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" />
+</LinearLayout>

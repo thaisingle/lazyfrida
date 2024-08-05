@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="8.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:theme="@style/text_title2.normal" android:textColor="@color/font_blue_grey" android:id="@id/key_item" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/credit_limit" />
+    <TextView android:theme="@style/text_title2" android:textColor="@color/font_grey" android:id="@id/value_item" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="2.0dip" android:text="@string/credit_limit" />
+    <View android:id="@id/view_line" android:background="@color/line_color" android:visibility="visible" android:layout_width="fill_parent" android:layout_height="1.0dip" />
+</LinearLayout>

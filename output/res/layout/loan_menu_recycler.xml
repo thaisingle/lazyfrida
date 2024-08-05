@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="horizontal" android:layout_width="76.0dip" android:layout_height="wrap_content" android:layout_marginTop="8.0dip" android:layout_marginEnd="16.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout android:orientation="vertical" android:id="@id/loanRegisterMainBox" android:layout_width="76.0dip" android:layout_height="wrap_content">
+        <RelativeLayout android:id="@id/iconBox" android:background="@drawable/loan_menu_background" android:layout_width="64.0dip" android:layout_height="64.0dip" app:layout_constraintBottom_toTopOf="@id/menuText" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+            <ImageView android:id="@id/iconImage" android:layout_width="32.0dip" android:layout_height="wrap_content" android:src="@drawable/ic_motor_bike" android:layout_centerInParent="true" android:contentDescription="@string/loan_menu_motor_bike_text" />
+        </RelativeLayout>
+        <TextView android:textSize="12.0sp" android:textColor="@color/font_dust" android:id="@id/menuText" android:layout_width="76.0dip" android:layout_height="wrap_content" android:layout_marginTop="6.0dip" android:text="@string/loan_menu_motor_bike_text" android:fontFamily="@font/prompt_regular" android:textAlignment="center" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/iconBox" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

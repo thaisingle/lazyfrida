@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:background="@color/bg_light_grey" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout android:orientation="vertical" android:id="@id/personalInformationBoxContainer" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginStart="16.0dip" android:layout_marginEnd="16.0dip">
+            <TextView android:theme="@style/text_title1" android:textColor="@color/font_grey" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/personal_information_title" android:layout_weight="0.9" />
+            <ImageView android:layout_gravity="center" android:id="@id/popUpEditPersonalInformation" android:layout_width="0.0dip" android:layout_height="wrap_content" android:src="@drawable/ic_edit" android:layout_weight="0.05" android:contentDescription="@string/icon_edit_content_description" />
+        </LinearLayout>
+        <LinearLayout android:orientation="vertical" android:id="@id/personalInformationBox" android:background="@drawable/round_corner_bg_white_no_stroke" android:paddingLeft="16.0dip" android:paddingRight="16.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="8.0dip" android:layout_marginBottom="16.0dip" android:layout_marginStart="16.0dip" android:layout_marginEnd="16.0dip" android:elevation="3.0dip" android:paddingHorizontal="16.0dip" android:outlineAmbientShadowColor="@color/shadow_color_grey">
+            <androidx.recyclerview.widget.RecyclerView android:id="@id/personalInformationRecycler" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginTop="8.0dip" android:layout_marginBottom="16.0dip" app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

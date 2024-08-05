@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:background="@drawable/splash_bg_end" android:visibility="invisible" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.appcompat.widget.Toolbar android:id="@id/toolBarBox" android:background="@color/white" android:padding="16.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout android:id="@id/headerBox" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <TextView android:textColor="@color/font_grey" android:id="@id/verifyOtpHeader" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/register_nano_finance_title" android:textAlignment="textStart" style="@style/text_heading" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+    <View android:id="@id/separateLineToolbar" android:background="@color/line_grey" android:layout_width="fill_parent" android:layout_height="2.0dip" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/toolBarBox" />
+    <ImageView android:id="@id/mascotSuccess" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="130.0dip" android:layout_marginTop="48.0dip" android:layout_marginRight="130.0dip" android:src="@drawable/mascot_success_1" android:layout_marginHorizontal="130.0dip" app:layout_constraintTop_toBottomOf="@id/separateLineToolbar" />
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="24.0dip" app:layout_constraintTop_toBottomOf="@id/mascotSuccess">
+        <TextView android:textColor="@color/font_green_light" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/register_nano_finance_success" android:textAlignment="center" style="@style/text_heading" />
+        <TextView android:textColor="@color/font_grey" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/register_nano_finance_success_title1" android:textAlignment="center" style="@style/text_title2" />
+        <TextView android:textColor="@color/font_grey" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/register_nano_finance_success_title2" android:textAlignment="center" style="@style/text_title2" />
+    </LinearLayout>
+    <com.google.android.material.button.MaterialButton android:id="@id/backToMainPage" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_margin="16.0dip" android:text="@string/back_to_previous_page" android:insetTop="0.0dip" android:insetBottom="0.0dip" android:outlineProvider="none" app:cornerRadius="8.0dip" app:layout_constraintBottom_toBottomOf="parent" style="@style/text_title2" />
+</androidx.constraintlayout.widget.ConstraintLayout>

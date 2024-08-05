@@ -1,0 +1,68 @@
+.class public final Lla/n;
+.super Lx9/c;
+.source "SourceFile"
+
+# interfaces
+.implements Lla/a;
+
+
+# instance fields
+.field public final a:Ly1/f;
+
+
+# direct methods
+.method public constructor <init>(Ly1/f;)V
+    .locals 1
+
+    const-string v0, "publicApolloClient"
+
+    invoke-static {v0, p1}, Lfe/v;->l(Ljava/lang/String;Ljava/lang/Object;)V
+
+    invoke-direct {p0}, Lx9/c;-><init>()V
+
+    iput-object p1, p0, Lla/n;->a:Ly1/f;
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final c(II)Lkotlinx/coroutines/flow/e;
+    .locals 2
+
+    .line 1
+    new-instance v0, Lla/i;
+
+    .line 2
+    .line 3
+    const/4 v1, 0x0
+
+    .line 4
+    invoke-direct {v0, p0, p1, p2, v1}, Lla/i;-><init>(Lla/n;IILhe/d;)V
+
+    .line 5
+    .line 6
+    .line 7
+    new-instance p1, Ls0/q;
+
+    .line 8
+    .line 9
+    invoke-direct {p1, v0}, Ls0/q;-><init>(Loe/c;)V
+
+    .line 10
+    .line 11
+    .line 12
+    sget-object p2, Lbh/d0;->b:Lkotlinx/coroutines/scheduling/c;
+
+    .line 13
+    .line 14
+    invoke-static {p1, p2}, Lw5/c;->c0(Ls0/q;Lkotlinx/coroutines/scheduling/c;)Lkotlinx/coroutines/flow/e;
+
+    .line 15
+    .line 16
+    .line 17
+    move-result-object p1
+
+    .line 18
+    return-object p1
+.end method

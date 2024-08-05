@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.appcompat.widget.Toolbar android:id="@id/toolBarBox" android:background="@color/white" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout android:id="@id/headerBox" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <ImageView android:id="@id/backButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/ic_back" android:contentDescription="@string/arrowIcon" />
+            <TextView android:textColor="@color/font_grey" android:id="@id/verifyOtpHeader" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/verify_otp" android:layout_marginStart="32.0dip" style="@style/text_heading" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+    <View android:id="@id/separateLineToolbar" android:background="@color/line_grey" android:layout_width="fill_parent" android:layout_height="2.0dip" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/toolBarBox" />
+    <com.ntbx.external.ngernturbo.ui.custom_view.verify_otp.VerifyOtpView android:id="@id/verifyOtpBox" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginTop="56.0dip" app:fragmentTypeName="SETUP_PIN_CODE" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/separateLineToolbar" app:layout_constraintVertical_bias="0.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>

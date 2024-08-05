@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:id="@id/dialog_dim_background" android:background="@color/dialog_dim_background" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.cardview.widget.CardView android:id="@id/dialog_box" android:layout_width="wrap_content" android:layout_height="wrap_content" app:cardCornerRadius="10.0dip" app:cardElevation="4.0dip" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+        <RelativeLayout android:paddingLeft="16.0dip" android:paddingTop="16.0dip" android:paddingRight="16.0dip" android:paddingBottom="15.0dip" android:clickable="false" android:layout_width="280.0dip" android:layout_height="wrap_content" android:paddingHorizontal="16.0dip" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+            <TextView android:textColor="@color/medium_pink" android:id="@id/dialog_header" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="8.0dip" style="@style/text_heading" />
+            <TextView android:textColor="@color/font_grey" android:id="@id/dialog_body" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/dialog_header" style="@style/text_paragraph" />
+            <LinearLayout android:gravity="end" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/dialog_body">
+                <TextView android:textColor="@color/font_grey" android:id="@id/negative_button" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="24.0dip" style="@style/text_button" />
+                <TextView android:textColor="@drawable/button_text_color" android:id="@id/positive_button" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="24.0dip" android:layout_marginStart="24.0dip" style="@style/text_button" />
+            </LinearLayout>
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

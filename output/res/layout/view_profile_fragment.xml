@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:background="@color/bg_light_grey" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.appcompat.widget.Toolbar android:id="@id/toolbar_box" android:background="@color/white" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minHeight="56.0dip" app:layout_constraintTop_toTopOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <ImageView android:id="@id/backIcon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/ic_back" android:contentDescription="@string/description_back" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" />
+            <TextView android:textColor="@color/font_grey" android:id="@id/textToolbar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/toolbar_view_profile" android:layout_marginStart="32.0dip" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toEndOf="@id/backIcon" app:layout_constraintTop_toTopOf="parent" style="@style/text_heading" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.Toolbar>
+    <View android:id="@id/view4" android:background="@color/line_grey" android:layout_width="fill_parent" android:layout_height="1.0dip" app:layout_constraintTop_toBottomOf="@id/toolbar_box" />
+    <androidx.constraintlayout.widget.ConstraintLayout android:id="@id/constraintLayout2" android:layout_width="fill_parent" android:layout_height="148.0dip" app:layout_constraintTop_toBottomOf="@id/toolbar_box">
+        <com.google.android.material.imageview.ShapeableImageView android:id="@id/customerImage" android:padding="2.0dip" android:layout_width="100.0dip" android:layout_height="100.0dip" android:src="@drawable/ic_guest_customer" android:scaleType="centerCrop" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:shapeAppearanceOverlay="@style/rounded_image_view_rounded" app:strokeColor="@color/light_pink" app:strokeWidth="2.0dip" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout android:orientation="vertical" android:id="@id/nameAndLastName" android:background="@color/white" android:paddingLeft="16.0dip" android:paddingTop="17.0dip" android:paddingRight="16.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layout_constraintTop_toBottomOf="@id/constraintLayout2">
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="18.0dip" app:layout_constraintBottom_toBottomOf="@id/view" app:layout_constraintTop_toTopOf="parent">
+            <TextView android:textColor="@color/font_pink" android:gravity="start" android:id="@id/nameAndLastNameLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/loan_register_label_input_name_customer" android:textAlignment="gravity" android:layout_marginEnd="39.0dip" style="@style/text_title2" />
+            <TextView android:textColor="@color/font_grey" android:id="@id/nameAndLastNameValue" android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/text_title2" />
+        </LinearLayout>
+        <View android:id="@id/view" android:background="@color/bg_light_grey" android:layout_width="fill_parent" android:layout_height="1.0dip" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintRight_toRightOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout android:orientation="vertical" android:id="@id/phoneNumber" android:background="@color/white" android:paddingLeft="16.0dip" android:paddingTop="17.0dip" android:paddingRight="16.0dip" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layout_constraintTop_toBottomOf="@id/nameAndLastName">
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="18.0dip" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintTop_toTopOf="parent">
+            <TextView android:textColor="@color/font_pink" android:gravity="start" android:id="@id/phoneNumberLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/loan_register_label_input_phone_number" android:textAlignment="gravity" android:layout_marginEnd="39.0dip" style="@style/text_title2" />
+            <TextView android:textColor="@color/font_grey" android:id="@id/phoneNumberValue" android:layout_width="fill_parent" android:layout_height="wrap_content" style="@style/text_title2" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

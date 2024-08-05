@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="fill_parent" android:layout_height="56.0dip" android:paddingStart="16.0dip">
+            <ImageView android:id="@id/iconBack" android:visibility="gone" android:layout_width="24.0dip" android:layout_height="24.0dip" android:src="@drawable/ic_back" android:contentDescription="@string/icon_back" android:layout_marginEnd="32.0dip" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toStartOf="@id/consentTitleText" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" />
+            <TextView android:textSize="18.0sp" android:textColor="@color/font_grey" android:id="@id/consentTitleText" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/consent_title" android:fontFamily="@font/prompt_medium" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toEndOf="@id/iconBack" app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <View android:background="@color/line_grey" android:layout_width="fill_parent" android:layout_height="1.0dip" />
+        <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <WebView android:id="@id/consentWebView" android:layout_width="fill_parent" android:layout_height="0.0dip" android:overScrollMode="never" app:layout_constraintBottom_toTopOf="@id/nextStepButton" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" />
+            <androidx.appcompat.widget.AppCompatButton android:enabled="false" android:textColor="@color/white" android:id="@id/nextStepButton" android:background="@drawable/round_corner_bg_pink" android:layout_width="fill_parent" android:layout_height="48.0dip" android:layout_marginBottom="24.0dip" android:text="@string/next_step" android:layout_marginStart="16.0dip" android:layout_marginEnd="16.0dip" android:stateListAnimator="@null" android:backgroundTint="@color/primary_button_color" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" style="@style/text_button" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

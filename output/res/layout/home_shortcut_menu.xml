@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/shortcutMenuBox" android:layout_width="93.0dip" android:layout_height="60.0dip"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:id="@id/shortcutMenuIcon" android:layout_width="40.0dip" android:layout_height="40.0dip" android:src="@drawable/ic_shortcut_menu_my_account" android:layout_centerHorizontal="true" android:contentDescription="@string/shortcut_menu_my_account" />
+    <TextView android:textColor="@color/medium_light_blue" android:id="@id/shortcutMenuText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/shortcut_menu_my_account" android:layout_below="@id/shortcutMenuIcon" android:layout_centerInParent="true" style="@style/text_title2" />
+</RelativeLayout>

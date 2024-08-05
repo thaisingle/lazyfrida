@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:background="@color/bg_light_grey" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.appcompat.widget.Toolbar android:id="@id/toolBar" android:background="@color/white" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <ImageView android:layout_gravity="center" android:id="@id/backIcon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/ic_back" android:contentDescription="@string/description_back" />
+            <TextView android:textColor="@color/font_grey" android:ellipsize="end" android:id="@id/textToolbar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/contracts_nano_finance" android:maxLines="1" android:layout_marginStart="32.0dip" android:layout_marginEnd="16.0dip" style="@style/text_heading" />
+        </LinearLayout>
+    </androidx.appcompat.widget.Toolbar>
+    <View android:id="@id/lineSeparate" android:background="@color/line_color" android:layout_width="fill_parent" android:layout_height="1.0dip" app:layout_constraintTop_toBottomOf="@id/toolBar" />
+    <LinearLayout android:orientation="vertical" android:id="@id/layoutDocument" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/lineSeparate">
+        <androidx.recyclerview.widget.RecyclerView android:id="@id/contractsNanoFinanceAdapter" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+    </LinearLayout>
+    <com.ntbx.external.ngernturbo.ui.custom_view.FragmentLoadingView android:id="@id/loadingBox" android:layout_width="fill_parent" android:layout_height="fill_parent" android:elevation="99.0dip" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

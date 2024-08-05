@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation android:id="@id/nav_graph" app:startDestination="@id/mainFragment"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <fragment android:label="main_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.main_page.main_fragment_holder.MainFragment" android:id="@id/mainFragment">
+        <action android:id="@id/action_mainFragment_to_contactUsFragment" app:destination="@id/contactUsFragment" />
+        <action android:id="@id/action_mainFragment_to_loginPinCodeFragment" app:destination="@id/loginPinCodeFragment" />
+        <action android:id="@id/action_mainFragment_to_pinCodeTestFragment" app:destination="@id/pinCodeTestFragment" />
+        <action android:id="@id/action_mainFragment_to_registerFragment" app:destination="@id/registerFragment" />
+        <action android:id="@id/action_mainFragment_to_faqFragment" app:destination="@id/faqFragment" />
+        <action android:id="@id/action_mainFragment_to_pinCodeSaveFragment" app:destination="@id/pinCodeSaveFragment" app:popUpTo="@id/mainFragment" app:popUpToInclusive="false" />
+        <action android:id="@id/action_mainFragment_to_inputChangeFragment" app:destination="@id/inputChangeFragment" />
+        <action android:id="@id/action_mainFragment_to_myAccountFragment" app:destination="@id/myAccountFragment" />
+        <action android:id="@id/action_mainFragment_to_consentFragment" app:destination="@id/consentFragment" />
+        <action android:id="@id/action_mainFragment_to_loanRegisterFragment" app:destination="@id/loanRegisterFragment" />
+        <action android:id="@id/action_mainFragment_to_searchAllBranchesFragment" app:destination="@id/searchAllBranchesFragment" />
+        <action android:id="@id/action_mainFragment_to_contentDetailFragment" app:destination="@id/contentDetailFragment" />
+        <action android:id="@id/action_mainFragment_to_pdfViewerFragment" app:destination="@id/pdfViewerFragment" />
+        <action android:id="@id/action_mainFragment_to_policyTableAndReceiptFragment" app:destination="@id/policyTableAndReceiptFragment" />
+        <action android:id="@id/action_mainFragment_to_paymentHistoryFragment" app:destination="@id/paymentHistoryFragment" />
+        <action android:id="@id/action_mainFragment_to_notificationReceiptFragment" app:destination="@id/notificationReceiptFragment" />
+        <action android:id="@id/action_mainFragment_to_loanSmartSearchFragment" app:destination="@id/loanSmartSearchFragment" />
+        <action android:id="@id/action_loanMyAccountFragment_to_contractPaymentFragment" app:destination="@id/contractPayment" app:exitAnim="@anim/stay_still" />
+        <action android:id="@id/action_mainFragment_to_branchDetailFragment" app:destination="@id/branchDetailFragment" />
+        <action android:id="@id/action_mainFragment_to_shortcutPaymentFragment" app:destination="@id/shortcutPaymentFragment" />
+        <action android:id="@id/action_mainFragment_to_viewProfileFragment" app:destination="@id/viewProfileFragment" />
+        <action android:id="@id/action_mainFragment_to_loanFragment" app:destination="@id/loanFragment" />
+        <action android:id="@id/action_mainFragment_to_notificationSettingFragment" app:destination="@id/notificationSettingFragment" />
+        <action android:id="@id/action_mainFragment_to_verifyPinCodeFragment" app:destination="@id/verifyPinCodeFragment" />
+        <action android:id="@id/action_mainFragment_to_ncbReportFragment" app:destination="@id/ncbReportFragment" />
+        <action android:id="@id/action_mainFragment_to_productDetailFragment" app:destination="@id/productDetailFragment" />
+        <action android:id="@id/action_mainFragment_to_errorPageFragment" app:destination="@id/errorPageFragment" />
+        <action android:id="@id/action_mainFragment_to_myDocumentFragment" app:destination="@id/myDocumentFragment" />
+        <action android:id="@id/action_mainFragment_to_setupPinCodeFragment" app:destination="@id/setupPinCodeFragment" />
+    </fragment>
+    <fragment android:label="home_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.main_page.home.HomeFragment" android:id="@id/homeFragment" />
+    <fragment android:label="AutomateTestFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.automate.AutomateTestFragment" android:id="@id/automateTestFragment" />
+    <fragment android:label="fragment_test_pincode2" android:name="com.ntbx.external.ngernturbo.ui.fragment.pin_code.PinCodeTestLoginFragment" android:id="@id/pinCodeTestLoginFragment">
+        <action android:id="@id/action_pinCodeTestLoginFragment_to_contactUsFragment" app:destination="@id/contactUsFragment" />
+    </fragment>
+    <fragment android:label="fragment_test_apollo" android:name="com.ntbx.external.ngernturbo.ui.fragment.pin_code.PinCodeTestFragment" android:id="@id/pinCodeTestFragment">
+        <action android:id="@id/action_pinCodeTestFragment_to_pinCodeTestLoginFragment" app:destination="@id/pinCodeTestLoginFragment" />
+    </fragment>
+    <fragment android:label="ContactUsFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.contact_us.ContactUsFragment" android:id="@id/contactUsFragment" />
+    <fragment android:label="fragment_other_tab_main_page" android:name="com.ntbx.external.ngernturbo.ui.fragment.main_page.other_info.OtherInfoPageFragment" android:id="@id/otherInfoPageFragment" />
+    <fragment android:label="ContactUsFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.faq.FaqMainFragment" android:id="@id/faqFragment" />
+    <fragment android:label="login_pincode" android:name="com.ntbx.external.ngernturbo.ui.fragment.pin_code.login_pin_code.LoginPinCodeFragment" android:id="@id/loginPinCodeFragment">
+        <action android:id="@id/action_loginPinCodeFragment_to_forgotpinFragment" app:destination="@id/forgotpinFragment" />
+        <action android:id="@id/action_loginFragment_to_SetupPinCodeFragment" app:destination="@id/setupPinCodeFragment" />
+        <action android:id="@id/action_loginPinCodeFragment_to_mainFragment" app:destination="@id/mainFragment" app:popUpTo="@id/mainFragment" app:popUpToInclusive="true" />
+    </fragment>
+    <fragment android:label="register" android:name="com.ntbx.external.ngernturbo.ui.fragment.register.RegisterFragment" android:id="@id/registerFragment">
+        <action android:id="@id/action_registerFragment_to_otpFragment" app:destination="@id/otpRegisterFragment" />
+    </fragment>
+    <fragment android:label="otp_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.otp.OtpRegisterFragment" android:id="@id/otpRegisterFragment">
+        <action android:id="@id/action_mainFragment_to_consentFragment" app:destination="@id/consentFragment" />
+        <action android:id="@id/action_otpRegisterFragment_to_consentFragment" app:destination="@id/consentFragment" app:popUpTo="@id/mainFragment" app:popUpToInclusive="false" />
+        <argument android:name="profileType" app:argType="com.ntbx.external.ngernturbo.data.model.profile.ProfileData" />
+        <action android:id="@id/action_otpRegisterFragment_to_pinCodeSaveFragment" app:destination="@id/pinCodeSaveFragment" app:popUpTo="@id/mainFragment" app:popUpToInclusive="false" />
+    </fragment>
+    <fragment android:label="fragment_forgotpin" android:name="com.ntbx.external.ngernturbo.ui.fragment.forgot_pin_code.ForgotPinCodeFragment" android:id="@id/forgotpinFragment">
+        <action android:id="@id/action_forgotpinFragment_to_otpForgotPinCodeFragment" app:destination="@id/otpForgotPinCodeFragment" />
+    </fragment>
+    <fragment android:label="fragment_result_change" android:name="com.ntbx.external.ngernturbo.ui.fragment.change_pin_code.ResultChangePinCodeFragment" android:id="@id/resultChangeFragment">
+        <action android:id="@id/action_resultChangeFragment_to_mainFragment" app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment android:label="fragment_input_change" android:name="com.ntbx.external.ngernturbo.ui.fragment.change_pin_code.ChangePinCodeFragment" android:id="@id/inputChangeFragment">
+        <action android:id="@id/action_inputChangeFragment_to_resultChangeFragment" app:destination="@id/resultChangeFragment" />
+    </fragment>
+    <fragment android:label="otp_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.otp.OtpForgotPinCodeFragment" android:id="@id/otpForgotPinCodeFragment">
+        <action android:id="@id/action_otpForgotPinCodeFragment_to_pinCodeSaveFragment" app:destination="@id/pinCodeSaveFragment" app:popUpTo="@id/mainFragment" app:popUpToInclusive="false" />
+        <argument android:name="phoneNumberType" app:argType="string" />
+    </fragment>
+    <fragment android:label="ConsentFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.consent.ConsentFragment" android:id="@id/consentFragment">
+        <argument android:name="screenEnum" app:argType="com.ntbx.external.ngernturbo.data.model.consent.ConsentScreenEnum" />
+        <action android:id="@id/action_consentFragment_to_pinCodeSaveFragment" app:destination="@id/pinCodeSaveFragment" app:popUpTo="@id/mainFragment" app:popUpToInclusive="false" />
+    </fragment>
+    <fragment android:label="setup_pin_code_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.pin_code.setup_pin_code.SetupPinCodeFragment" android:id="@id/setupPinCodeFragment">
+        <action android:id="@id/action_setupPinCodeFragment_to_otpSetupPinCodeFragment" app:destination="@id/otpSetupPinCodeFragment" />
+    </fragment>
+    <fragment android:label="fragment_pincode_save" android:name="com.ntbx.external.ngernturbo.ui.fragment.save_pin_code.SavePinCodeFragment" android:id="@id/pinCodeSaveFragment">
+        <argument android:name="pincodeType" app:argType="com.ntbx.external.ngernturbo.data.model.save_pincode.PinCodeFragmentEnum" />
+        <action android:id="@id/action_pinCodeSaveFragment_to_successPinCodeFragment" app:destination="@id/successPinCodeFragment" />
+    </fragment>
+    <fragment android:label="my_account_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.main_page.my_account.MyAccountFragment" android:id="@id/myAccountFragment" />
+    <fragment android:label="loan_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.main_page.loan.LoanFragment" android:id="@id/loanFragment">
+        <action android:id="@id/action_loanFragment_to_loanSmartSearchFragment" app:destination="@id/loanSmartSearchFragment" />
+    </fragment>
+    <fragment android:label="otp_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.otp.OtpSetupPinCodeFragment" android:id="@id/otpSetupPinCodeFragment">
+        <action android:id="@id/action_otpSetupPinCodeFragment_to_pinCodeSaveFragment" app:destination="@id/pinCodeSaveFragment" app:popUpTo="@id/mainFragment" app:popUpToInclusive="false" />
+        <argument android:name="phoneNumberType" app:argType="string" />
+    </fragment>
+    <fragment android:label="SuccessPinCodeFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.success_pin_code.SuccessPinCodeFragment" android:id="@id/successPinCodeFragment">
+        <argument android:name="pincodeType" app:argType="com.ntbx.external.ngernturbo.data.model.save_pincode.PinCodeFragmentEnum" />
+        <action android:id="@id/action_successPinCodeFragment_to_mainFragment" app:destination="@id/mainFragment" app:popUpToInclusive="true" />
+        <action android:id="@id/action_successPinCodeFragment_to_loginPinCodeFragment" app:destination="@id/loginPinCodeFragment" app:popUpTo="@id/mainFragment" app:popUpToInclusive="false" />
+    </fragment>
+    <fragment android:label="LoanRegisterFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.main_page.loan.loan_register.LoanRegisterFragment" android:id="@id/loanRegisterFragment">
+        <argument android:name="productType" app:argType="com.ntbx.external.ngernturbo.data.model.loan.LoanProductEnum" />
+        <action android:id="@id/action_loanRegisterFragment_to_successLoanRegisterFragment" app:destination="@id/successLoanRegisterFragment" />
+    </fragment>
+    <fragment android:label="SuccessLoanRegisterFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.main_page.loan.success_loan_register.SuccessLoanRegisterFragment" android:id="@id/successLoanRegisterFragment">
+        <argument android:name="productType" app:argType="com.ntbx.external.ngernturbo.data.model.loan.LoanProductEnum" />
+    </fragment>
+    <fragment android:label="SearchAllBranchesFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.search.search_all_branches.SearchAllBranchesFragment" android:id="@id/searchAllBranchesFragment">
+        <action android:id="@id/action_searchAllBranchesFragment_to_loanSmartSearchFragment" app:destination="@id/loanSmartSearchFragment" />
+        <action android:id="@id/action_searchAllBranchesFragment_to_branchDetailFragment" app:destination="@id/branchDetailFragment" />
+        <action android:id="@id/action_searchAllBranchesFragment_to_selectProvinceFragment" app:destination="@id/selectProvinceFragment" />
+    </fragment>
+    <fragment android:label="PdfViewerFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.pdf_viewer.PdfViewerFragment" android:id="@id/pdfViewerFragment">
+        <argument android:name="PdfViewerRequest" app:argType="com.ntbx.external.ngernturbo.data.model.pdf_viewer.PdfViewerRequest" />
+    </fragment>
+    <fragment android:label="ContentDetailFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.content_detail.ContentDetailFragment" android:id="@id/contentDetailFragment">
+        <argument android:name="websiteUrl" app:argType="string" />
+        <argument android:name="platform" app:argType="string" />
+    </fragment>
+    <fragment android:label="policyTableAndReceipt" android:name="com.ntbx.external.ngernturbo.ui.fragment.policy_table_and_receipt.PolicyTableAndReceiptFragment" android:id="@id/policyTableAndReceiptFragment">
+        <action android:id="@id/action_policyTableAndReceiptFragment_to_pdfViewerFragment" app:destination="@id/pdfViewerFragment" />
+        <argument android:name="policyTable" app:argType="string" app:nullable="true" />
+        <argument android:name="receipt" app:argType="string" app:nullable="true" />
+        <argument android:name="insuranceType" app:argType="string" app:nullable="true" />
+        <argument android:name="companyNameTh" app:argType="string" app:nullable="true" />
+        <argument android:name="productTypeName" app:argType="string" app:nullable="true" />
+    </fragment>
+    <fragment android:label="showFullImageFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.show_full_image.ShowFullImageFragment" android:id="@id/showFullImageFragment">
+        <argument android:name="position" app:argType="integer" />
+        <argument android:name="pictureListPath" app:argType="string[]" />
+    </fragment>
+    <fragment android:label="payment_history" android:name="com.ntbx.external.ngernturbo.ui.fragment.payment_history.PaymentHistoryFragment" android:id="@id/paymentHistoryFragment">
+        <argument android:name="paymentData" app:argType="com.ntbx.external.ngernturbo.data.model.payment.PaymentHistories" />
+        <argument android:name="contractNumber" android:defaultValue="" app:argType="string" />
+        <action android:id="@id/action_paymentHistoryFragment_to_pdfViewerFragment" app:destination="@id/pdfViewerFragment" />
+    </fragment>
+    <fragment android:label="loanMyAccount" android:name="com.ntbx.external.ngernturbo.ui.fragment.main_page.my_account.loan.LoanMyAccountFragment" android:id="@id/loanMyAccountFragment" />
+    <fragment android:label="payment" android:name="com.ntbx.external.ngernturbo.ui.fragment.payment.ContractPaymentFragment" android:id="@id/contractPayment">
+        <argument android:name="loanInfoData" android:defaultValue="@null" app:argType="com.ntbx.external.ngernturbo.data.model.loan.LoanInfoData" app:nullable="true" />
+        <argument android:name="notificationData" android:defaultValue="@null" app:argType="com.ntbx.external.ngernturbo.data.model.notification.NotificationData" app:nullable="true" />
+    </fragment>
+    <fragment android:label="dialog_select_province" android:name="com.ntbx.external.ngernturbo.ui.fragment.search.filter_province.SelectProvinceFragment" android:id="@id/selectProvinceFragment">
+        <argument android:name="radioButtonId" android:defaultValue="0" app:argType="integer" />
+    </fragment>
+    <fragment android:label="shortcutPaymentFragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.payment.ShortcutPaymentFragment" android:id="@id/shortcutPaymentFragment">
+        <action android:id="@id/action_shortcutPaymentFragment_to_invoicePaymentFragment" app:destination="@id/invoicePaymentFragment" app:enterAnim="@anim/slide_in_left" app:exitAnim="@anim/stay_still" />
+    </fragment>
+    <fragment android:label="receipt" android:name="com.ntbx.external.ngernturbo.ui.fragment.main_page.notification.notification_receipt.NotificationReceiptFragment" android:id="@id/notificationReceiptFragment">
+        <argument android:name="imageURL" app:argType="string" />
+    </fragment>
+    <fragment android:label="payment" android:name="com.ntbx.external.ngernturbo.ui.fragment.invoice_payment.InvoicePaymentFragment" android:id="@id/invoicePaymentFragment">
+        <argument android:name="invoicePaymentData" app:argType="com.ntbx.external.ngernturbo.data.model.invoice_payment.InvoicePaymentData" />
+        <argument android:name="isHaveOverdueList" android:defaultValue="false" app:argType="boolean" />
+    </fragment>
+    <fragment android:label="error_page_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.error.ErrorPageFragment" android:id="@id/errorPageFragment">
+        <action android:id="@id/action_errorPageFragment_to_BranchDetailFragment" app:destination="@id/branchDetailFragment" />
+        <action android:id="@id/action_errorPageFragment_to_MainFragment" app:destination="@id/mainFragment" />
+        <argument android:name="errorPage" app:argType="com.ntbx.external.ngernturbo.data.model.error.ErrorPageParcelizeData" />
+    </fragment>
+    <fragment android:label="branch_detail_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.branch.BranchDetailFragment" android:id="@id/branchDetailFragment">
+        <argument android:name="branchDetail" app:argType="com.ntbx.external.ngernturbo.data.model.branch.BranchDetailParcelizeData" />
+    </fragment>
+    <fragment android:label="smart_search" android:name="com.ntbx.external.ngernturbo.ui.fragment.main_page.loan.smart_search.LoanSmartSearchFragment" android:id="@id/loanSmartSearchFragment">
+        <action android:id="@id/action_smartSearch_to_branchDetailFragment" app:destination="@id/branchDetailFragment" />
+    </fragment>
+    <fragment android:label="payment_option_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.payment.paymentOption.PaymentOptionFragment" android:id="@id/paymentOptionFragment" />
+    <fragment android:label="view_profile_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.main_page.other_info.view_profile.ViewProfileFragment" android:id="@id/viewProfileFragment" />
+    <fragment android:label="notification_setting_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.notification_setting.NotificationSettingFragment" android:id="@id/notificationSettingFragment" />
+    <fragment android:label="fragment_verify_pin_code" android:name="com.ntbx.external.ngernturbo.ui.fragment.pin_code.verify_pin_code.VerifyPinCodeFragment" android:id="@id/verifyPinCodeFragment">
+        <argument android:name="confirmType" app:argType="com.ntbx.external.ngernturbo.data.model.pin_code.VerifyPinCodeEnum" />
+        <action android:id="@id/action_verifyPinCodeFragment_to_forgotpinFragment" app:destination="@id/forgotpinFragment" />
+        <action android:id="@id/action_verifyPinCodeFragment_to_SetupPinCodeFragment" app:destination="@id/setupPinCodeFragment" />
+        <action android:id="@id/action_verifyPinCodeFragment_to_financeFragment" app:destination="@id/financeFragment" />
+    </fragment>
+    <fragment android:label="fragment_ncb_report" android:name="com.ntbx.external.ngernturbo.ui.fragment.ncb_report.NcbReportFragment" android:id="@id/ncbReportFragment">
+        <action android:id="@id/action_ncbReportFragment_to_pdfViewerFragment" app:destination="@id/pdfViewerFragment" />
+        <action android:id="@id/action_ncbReportFragment_to_monthSelectFragment" app:destination="@id/ncbMonthSelectFragment" />
+    </fragment>
+    <fragment android:label="ncb_month_selection_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.ncb_report.ncb_type.NcbMonthSelectFragment" android:id="@id/ncbMonthSelectFragment">
+        <argument android:name="listMonth" android:defaultValue="@null" app:argType="com.ntbx.external.ngernturbo.data.model.credit_report.NcbListMonthData" app:nullable="true" />
+        <action android:id="@id/action_ncbSelectMonthFragment_to_pdfViewerFragment" app:destination="@id/pdfViewerFragment" />
+    </fragment>
+    <fragment android:label="product_detail_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.nano_finance.product_detail.ProductDetailFragment" android:id="@id/productDetailFragment">
+        <action android:id="@id/action_productDetailFragment_to_invoicePaymentFragment" app:destination="@id/invoicePaymentFragment" />
+        <action android:id="@id/action_productDetailFragment_to_errorPageFragment" app:destination="@id/errorPageFragment" />
+        <action android:id="@id/action_productDetailFragment_to_pdfViewerFragment" app:destination="@id/pdfViewerFragment" />
+        <action android:id="@id/action_productDetailFragment_to_verifyPinCodeFragment" app:destination="@id/verifyPinCodeFragment" />
+    </fragment>
+    <fragment android:label="finance_fragment" android:name="com.ntbx.external.ngernturbo.ui.fragment.nano_finance.finance.FinanceFragment" android:id="@id/financeFragment">
+        <action android:id="@id/action_finance_to_summary_information_contract" app:destination="@id/summaryInformationContract" />
+        <action android:id="@id/action_finance_fragment_to_error_page_fragment" app:destination="@id/errorPageFragment" />
+    </fragment>
+    <fragment android:label="fragment_summary_information_contract" android:name="com.ntbx.external.ngernturbo.ui.fragment.nano_finance.summary_information.SummaryInformationContract" android:id="@id/summaryInformationContract">
+        <action android:id="@id/action_summary_information_to_consentFragment" app:destination="@id/consentFragment" />
+        <action android:id="@id/action_summary_information_to_contentDetailFragment" app:destination="@id/contentDetailFragment" />
+        <action android:id="@id/action_summary_information_to_verify_otp_finance" app:destination="@id/verifyOtpFinance" />
+        <action android:id="@id/action_summary_information_to_errorPageFragment" app:destination="@id/errorPageFragment" />
+    </fragment>
+    <fragment android:label="fragment_verify_otp_finance" android:name="com.ntbx.external.ngernturbo.ui.fragment.nano_finance.otp.VerifyOtpFinance" android:id="@id/verifyOtpFinance">
+        <argument android:name="phoneNumberType" app:argType="string" />
+        <action android:id="@id/action_verify_otp_finance_to_success_finance_register" app:destination="@id/successFinanceRegister" />
+    </fragment>
+    <fragment android:label="fragment_success_finance_register" android:name="com.ntbx.external.ngernturbo.ui.fragment.nano_finance.success_register.SuccessFinanceRegister" android:id="@id/successFinanceRegister" />
+    <fragment android:label="fragment_my_document" android:name="com.ntbx.external.ngernturbo.ui.fragment.my_document.MyDocumentFragment" android:id="@id/myDocumentFragment">
+        <action android:id="@id/action_my_document_fragment_to_ncb_report_fragment" app:destination="@id/ncbReportFragment" />
+        <action android:id="@id/action_my_document_fragment_to_contracts_nano_finance_fragment" app:destination="@id/contractsNanoFinanceFragment" />
+    </fragment>
+    <fragment android:label="fragment_contracts_nano_finance" android:name="com.ntbx.external.ngernturbo.ui.fragment.contracts_nano_finance.ContractsNanoFinanceFragment" android:id="@id/contractsNanoFinanceFragment">
+        <action android:id="@id/action_contractNanoFinance_to_pdfViewerFragment" app:destination="@id/pdfViewerFragment" />
+    </fragment>
+</navigation>

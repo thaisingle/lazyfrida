@@ -15,6 +15,7 @@ import time
 
 
 
+
 def create_virtualenv(env_name):
 	print("\n---> Start creating environment...")
 
@@ -508,7 +509,7 @@ def countdown_min(total_seconds):
 		time.sleep(1)
 		total_seconds -= 1
 
-	print("Countdown finished!")
+	print("Countdown finished!\r")
 
 
 
@@ -528,13 +529,10 @@ def remount_writable_emlator():
 			countdown_min(30)
 			check_root_access()
 
-			# Attempt to remount the system partition as writable
 			command = ["adb", "remount"]
 			result = run_command2(command, "Attempt to remount the system partition as writable")
 
-			print('mount')
-			# Additional command to ensure /system can be remounted as rw
-			command = ["adb", "shell", "mount -o rw,remount /"]
+			command = ["adb", "shell", "mount -o rw,remount /system"]
 			result = run_command2(command, "Command to ensure /system can be remounted as rw")
 		else:
 				print("Failure to install Burp Suite Certificate")
@@ -562,7 +560,8 @@ def install_cert():
 		# Check if it's an emulator or a real device
 		if is_emulator():
 			# It's an emulator
-			output = remount_writable_emlator()
+			#output = remount_writable_emlator()
+			print(1)
 		else:
 			# It's a real device
 			command = ["adb", "shell", "su", "-c", "mount -o rw,remount /"]

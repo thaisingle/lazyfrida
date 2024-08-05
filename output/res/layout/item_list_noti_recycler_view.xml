@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginBottom="6.0dip" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintTop_toTopOf="parent">
+            <com.google.android.material.card.MaterialCardView android:id="@id/cardContent1" android:layout_width="4.0dip" android:layout_height="fill_parent" android:elevation="0.0dip" app:cardCornerRadius="0.0dip">
+                <androidx.constraintlayout.widget.ConstraintLayout android:id="@id/box" android:background="@color/font_pink" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView android:id="@id/cardContent" android:layout_width="fill_parent" android:layout_height="wrap_content" android:elevation="1.0dip" app:cardCornerRadius="0.0dip">
+                <androidx.constraintlayout.widget.ConstraintLayout android:id="@id/contentBox" android:background="@color/bg_very_pale_pink" android:paddingTop="16.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent" android:paddingStart="16.0dip" android:paddingEnd="16.0dip">
+                    <TextView android:textColor="@color/font_grey" android:id="@id/date" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/date_text" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" style="@style/text_paragraph" />
+                    <TextView android:textColor="@color/medium_pink" android:id="@id/title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4.0dip" android:text="@string/payment_success_text" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/date" style="@style/text_heading" />
+                    <TextView android:textColor="@color/font_grey" android:id="@id/content" android:layout_width="0.0dip" android:layout_height="wrap_content" android:layout_marginTop="4.0dip" android:layout_marginBottom="16.0dip" android:text="@string/notification_content_text" app:layout_constraintBottom_toTopOf="@id/button" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/title" style="@style/text_paragraph" />
+                    <Button android:gravity="center" android:id="@id/button" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="16.0dip" android:text="@string/payment_button_text" android:letterSpacing="0.0" app:layout_constraintBottom_toBottomOf="@id/view" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/content" style="@style/custom_outline_box_button" />
+                    <View android:id="@id/view" android:background="@color/line_grey" android:layout_width="fill_parent" android:layout_height="1.0dip" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintRight_toRightOf="parent" app:layout_constraintStart_toStartOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>

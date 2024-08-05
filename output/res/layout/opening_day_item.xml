@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textColor="@color/font_grey" android:id="@id/openingDay" android:layout_width="120.0dip" android:layout_height="wrap_content" style="@style/text_paragraph" />
+    <TextView android:textColor="@color/font_grey" android:gravity="start" android:id="@id/openingTime" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginStart="10.0dip" android:layout_toEndOf="@id/openingDay" style="@style/text_paragraph" />
+</RelativeLayout>

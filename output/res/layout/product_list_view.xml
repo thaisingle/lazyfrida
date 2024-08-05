@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.viewpager2.widget.ViewPager2 android:id="@id/productList" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+    <com.google.android.material.tabs.TabLayout android:id="@id/tabIndicator" android:background="@android:color/transparent" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="30.0dip" android:layout_marginTop="8.0dip" app:tabBackground="@drawable/my_account_indicator" app:tabGravity="center" app:tabIndicatorHeight="0.0dip" app:tabPaddingEnd="10.0dip" />
+</LinearLayout>

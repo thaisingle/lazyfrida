@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@color/bg_light_grey" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout android:id="@id/insuranceNotFoundLayout" android:background="@color/white" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <ImageView android:id="@id/iconInsuranceNotFound" android:layout_width="100.0dip" android:layout_height="100.0dip" android:layout_marginTop="48.0dip" android:contentDescription="@string/iconInsuranceNotFound" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:srcCompat="@drawable/ic_insurance_not_found" />
+        <TextView android:textColor="@color/font_dust" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="24.0dip" android:text="@string/text_insurance_contract_not_found" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/iconInsuranceNotFound" style="@style/text_title1" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.core.widget.NestedScrollView android:id="@id/scrollViewInsurance" android:layout_width="fill_parent" android:layout_height="fill_parent" android:fillViewport="true">
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <FrameLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <androidx.viewpager2.widget.ViewPager2 android:orientation="horizontal" android:id="@id/insuranceCardViewPager" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            </FrameLayout>
+            <com.google.android.material.tabs.TabLayout android:id="@id/tabIndicator" android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="16.0dip" android:layout_marginRight="16.0dip" app:tabBackground="@drawable/my_account_indicator" app:tabGravity="center" app:tabIndicatorHeight="0.0dip" app:tabPaddingEnd="7.0dip" app:tabPaddingStart="7.0dip" />
+            <androidx.viewpager2.widget.ViewPager2 android:orientation="horizontal" android:id="@id/insuranceInfoViewPager" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <com.ntbx.external.ngernturbo.ui.custom_view.FragmentLoadingView android:id="@id/loadingBox" android:layout_width="fill_parent" android:layout_height="fill_parent" android:elevation="99.0dip" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="parent" app:layout_constraintTop_toTopOf="parent" />
+</RelativeLayout>

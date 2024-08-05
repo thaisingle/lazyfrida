@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.appcompat.widget.Toolbar android:id="@id/toolbar" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minHeight="56.0dip" app:layout_constraintTop_toTopOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <ImageView android:id="@id/iconBack" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/ic_back" android:contentDescription="@string/description_back" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" />
+            <TextView android:theme="@style/text_heading" android:textColor="@color/font_grey" android:id="@id/text_Toolbar" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/toolbar_register" android:layout_marginStart="32.0dip" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toEndOf="@id/iconBack" app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.Toolbar>
+    <View android:background="@color/line_grey" android:layout_width="fill_parent" android:layout_height="1.0dip" app:layout_constraintTop_toBottomOf="@id/toolbar" />
+    <com.ntbx.external.ngernturbo.ui.custom_view.pincode.PinCode android:id="@id/pin_code" android:layout_width="fill_parent" android:layout_height="0.0dip" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintTop_toBottomOf="@id/toolbar" app:titleFirstHeader="@string/head_forgot_new" app:titleFirstHeaderColor="@color/font_pink" app:titleFirstHeaderSize="18.0" app:titleSecondHeader="@string/subtext_forgot_new" app:titleSecondHeaderColor="@color/font_grey" app:titleSecondHeaderSize="14.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>
